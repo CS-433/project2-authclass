@@ -4,7 +4,7 @@ Language Stylometry Project
 
 ## Organization:
         
-         ---- user_level.csv
-**Data** --|
-        ---- **user_comments** --- .json files
+            ___ user_level.csv
+**Data** __|
+            ___**user_comments** ___ .json files
        
