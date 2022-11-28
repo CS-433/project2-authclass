@@ -1,2 +1,4 @@
 Data/user_levels.csv
 *.json
+Data/processed_comments
+__pycache__/Language_Detection.cpython-310.pyc
