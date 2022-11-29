@@ -4,6 +4,7 @@ import random as random
 import langdetect
 from langdetect import DetectorFactory
 from tqdm import tqdm
+import time
 
 def langdetect_dataframe(df,seed =0):
     ''' Detect the language of each body in the dataframe.  
@@ -51,13 +52,17 @@ def human_class_df(df):
         whith no undefined values anymore : everything is classed as 'fr','en' or 'N'.
     '''
     for index,row in df[df['body_lang']=='U'].iterrows():
-         df.at[index,'body_lang']=human_classification(row['body'])
+        value = human_classification(row['body'])
+        if value == 'e' :
+            break
+        df.at[index,'body_lang'] = value
     return df
 
 def human_classification(comment):
     ans = '-1'
-    while(ans!='0' and ans!='1' and ans!='2'):
-        print("Is the comment ",comment," written in English (1), French (2) or another body_lang (0) ?")
+    while(ans!='0' and ans!='1' and ans!='2' and ans!='e'):
+        print("\"",comment,"\" = English (1), French (2) or other (0) ? \n Type 'e' to exit")
+        time.sleep(0.5)
         ans = input()
     if ans == '2' :
         value='fr'
@@ -65,4 +70,6 @@ def human_classification(comment):
         value='en'
     if ans == '0' :
         value='N'
+    if ans =='e': 
+        value='e'
     return value
