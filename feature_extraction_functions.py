@@ -35,46 +35,130 @@ from tqdm import tqdm
 from tqdm.notebook import tqdm
 tqdm.pandas()
 from autocorrect import Speller
+import statistics
+from nltk.util import ngrams
+import random
 
 
 #################################################################
 
-def character_ngrams(feed, collection, kind):
-    feed_lower = feed.lower()
-    lhs = ['feed_lower.count(\''] * len(collection)
-    rhs = ['\')'] * len(collection)
-    char_ngrams = []
-    for p1, p2, p3 in zip(lhs, collection, rhs):
-        command = p1 + p2 + p3
-        if (p2 != ('\\' + string.punctuation[6])) & (p2 != ('\\\\')):
-            command = command.replace('\\', '', 1)
-        char_ngrams.append(eval(command))
-    num_chars = sum(char_ngrams)
-    if num_chars == 0:
-        num_chars = 1
-    return [x / num_chars for x in char_ngrams]
+def character_ngrams(feed, collection, n):
+    ngrams = []
+    for token in feed:
+        for i in range(len(token)-n+1):
+            ngrams.append(token[i:(i+n)].lower())
+    ngrams = ngrams + collection
+    c = Counter(ngrams)
+    result = []
+    for ngram in collection:
+        result.append(c[ngram])
+    len_col = len(collection)
+    tot_result = sum(result)
+    denom = tot_result - len_col
+    if denom == 0:
+        denom = 1
+    return [(x-1) / denom for x in result]
 
-def character_ngrams_wrapper(dataframe, textcolumn, newcolumn, n, kind='letter'):
-    print("Performing " + kind + " " + str(n) + "-gram...")
+def character_ngrams_wrapper(dataframe, feed_token_space, newcolumn, n, kind='letter', train_collection = None):
     baseline = time.time()
-    if kind == 'letter':
-        collection = list(string.ascii_lowercase)
-    if kind == 'digit':
-        collection = list(string.digits)
-    if kind == 'punctuation':
-        collection_temp = list(string.punctuation)
-        collection = ['\\' + a for a in collection_temp]
-    if n == 2:
-        collection = [a + b for a in collection for b in collection]
-    if n == 3:
-        collection = [a + b + c for a in collection for b in collection for c in collection]
-    if n == 4:
-        collection = [a + b + c + d for a in collection for b in collection for c in collection for d in collection]
-    dataframe[newcolumn] = dataframe[textcolumn].apply(character_ngrams, args = (collection,kind))
-    print("Performed " + kind + " " + str(n) + "-gram in " + str(time.time() - baseline) + " seconds")
+    if train_collection == None:
+        print("Performing train " + kind + " " + str(n) + "-gram...")
+        # Create list of all tokens across all train feeds
+        master_feed = dataframe[feed_token_space].apply(pd.Series).stack().tolist()
+        # Create list of viable n-grams based on function arguments
+        if kind == 'letter':
+            collection = list(string.ascii_lowercase)
+        if kind == 'digit':
+            collection = list(string.digits)
+        if kind == 'punctuation':
+            collection_temp = list(string.punctuation)
+            collection_temp.append('“')
+            collection_temp.append('”')
+            collection_temp.append('’')
+            collection = collection_temp
+        if n == 2:
+            collection = [a + b for a in collection for b in collection]
+        if n == 3:
+            collection = [a + b + c for a in collection for b in collection for c in collection]
+        if n == 4:
+            collection = [a + b + c + d for a in collection for b in collection for c in collection for d in collection]
+        # Calculate all possible n-grams from master_feed
+        ngrams = []
+        for token in master_feed:
+            for i in range(len(token)-n+1):
+                ngram = token[i:(i+n)].lower()
+                if ngram in collection:
+                    ngrams.append(ngram.lower())
+        # Calculate frequencies, keep only the top 50
+        c = Counter(ngrams).most_common()
+        upper = 50
+        if len(c) < upper:
+            upper = len(c)
+        upto50_collection = []
+        for i in range(upper):
+            upto50_collection.append(c[i][0])
+        upto50_collection.sort()  
+    if train_collection != None:
+        print("Performing test " + kind + " " + str(n) + "-gram...")
+        upto50_collection = train_collection
+    print(upto50_collection)
+    dataframe[newcolumn] = dataframe[feed_token_space].progress_apply(character_ngrams, args = (upto50_collection,n))
+    # Return upto50_collection for later use with test set - unless this function WAS being called on the test set!
+    if train_collection == None:   
+        print("Performed train " + kind + " " + str(n) + "-gram in " + str(time.time() - baseline) + " seconds")
+        print("Returned up to 50 most common " + kind + " " + str(n) + "-grams for feature extraction on test set.")
+        return upto50_collection
+    else:
+        print("Performed test " + kind + " " + str(n) + "-gram in " + str(time.time() - baseline) + " seconds")
 
 #################################################################
 
+def multchar_ngrams(list_of_lists_of_strings, collection, n):
+    c = Counter("")
+    for list_of_strings in list_of_lists_of_strings:
+        c = c + Counter(list(ngrams(list_of_strings, n)))
+    c = c + Counter(collection)
+    result = []
+    for ngram in collection:
+        result.append(c[ngram])
+    len_col = len(collection)
+    tot_result = sum(result)
+    denom = tot_result - len_col
+    if denom == 0:
+        denom = 1
+    return [(x-1) / denom for x in result]
+
+def word_ngrams_wrapper(dataframe, feed_comment_list_nopunc_lower, newcolumn, n, train_collection = None):
+    baseline = time.time()
+    if train_collection == None:
+        print("Performing train word " + str(n) + "-gram...")
+        master_comment_list = dataframe[feed_comment_list_nopunc_lower].apply(pd.Series).stack().tolist()
+        c = Counter("")
+        for comment in master_comment_list:
+            c = c + Counter(list(ngrams(comment, n)))
+        c = c.most_common()
+        upper = 50
+        if len(c) < upper:
+            upper = len(c)
+        upto50_collection = []
+        for i in range(upper):
+            upto50_collection.append(c[i][0])
+        upto50_collection.sort() 
+    if train_collection != None:
+        print("Performing test word " + str(n) + "-gram...")
+        upto50_collection = train_collection
+    print(upto50_collection)
+    dataframe[newcolumn] = dataframe[feed_comment_list_nopunc_lower].progress_apply(multchar_ngrams, args = (upto50_collection,n))
+    # Return upto50_collection for later use with test set - unless this function WAS being called on the test set!
+    if train_collection == None:   
+        print("Performed train word " + str(n) + "-gram in " + str(time.time() - baseline) + " seconds")
+        print("Returned up to 50 most common word" + str(n) + "-grams for feature extraction on test set.")
+        return upto50_collection
+    else:
+        print("Performed test word " + str(n) + "-gram in " + str(time.time() - baseline) + " seconds")
+        
+#################################################################   
+        
 def character_count_proportion(feed, collection, kind):
     feed_lower = feed.lower()
     #feed_lower_no_ws = feed.translate({ord(c): None for c in string.whitespace}).lower() # removes spaces and linebreaks
@@ -89,7 +173,7 @@ def character_count_proportion(feed, collection, kind):
     if kind == "character":
         return len(feed_lower), 1
               
-def character_count_proportion_wrapper(dataframe, textcolumn, kind='letter'):
+def character_count_proportion_wrapper(dataframe, feed_string, kind='letter'):
     print("Performing " + kind + " count & proportion...")
     baseline = time.time()
     if kind == 'letter':
@@ -102,7 +186,7 @@ def character_count_proportion_wrapper(dataframe, textcolumn, kind='letter'):
         collection = list(string.whitespace)
     if kind == 'character':
         collection = ['only included for the sake of function call']
-    dataframe[kind + '_count_prop'] = dataframe[textcolumn].apply(character_count_proportion, args = (collection,kind))
+    dataframe[kind + '_count_prop'] = dataframe[feed_string].apply(character_count_proportion, args = (collection,kind))
     dataframe[[kind + '_count', kind + '_prop']] = pd.DataFrame(dataframe[kind + '_count_prop'].tolist(), index=dataframe.index)
     dataframe = dataframe.drop([kind + '_count_prop'], axis = 1)
     if kind == "character":
@@ -129,10 +213,10 @@ def word_count(feed):
     total_words = len(words)
     return total_words
 
-def word_count_wrapper(dataframe, textcolumn):
+def word_count_wrapper(dataframe, feed_string):
     print("Performing word count...")
     baseline = time.time()
-    dataframe['word_count'] = dataframe[textcolumn].apply(word_count)
+    dataframe['word_count'] = dataframe[feed_string].apply(word_count)
     print("Performed word count in " + str(time.time() - baseline) + " seconds")
 
 #################################################################
@@ -144,10 +228,10 @@ def word_length_avg(feed):
         word_lengths.append(len(word))
     return sum(word_lengths) / len(word_lengths)
     
-def word_length_avg_wrapper(dataframe, textcolumn):
+def word_length_avg_wrapper(dataframe, feed_string):
     print("Performing word length avg...")
     baseline = time.time()
-    dataframe['word_length_avg'] = dataframe[textcolumn].apply(word_length_avg)
+    dataframe['word_length_avg'] = dataframe[feed_string].apply(word_length_avg)
     print("Performed word length avg in " + str(time.time() - baseline) + " seconds")
     
 #################################################################
@@ -167,10 +251,10 @@ def word_length_distribution(feed):
     length_distro = [(x-1)/wc for x in length_distro_temp]
     return length_distro
 
-def word_length_distribution_wrapper(dataframe, textcolumn):
+def word_length_distribution_wrapper(dataframe, feed_string):
     print("Performing word length distribution...")
     baseline = time.time()
-    dataframe['word_length_distribution'] = dataframe[textcolumn].apply(word_length_distribution)
+    dataframe['word_length_distribution'] = dataframe[feed_string].apply(word_length_distribution)
     print("Performed word length distribution in " + str(time.time() - baseline) + " seconds")
     
 #################################################################
@@ -204,10 +288,10 @@ def letter_case_distribution(feed):
     total = lc_count + uc_count
     return [lc_count/total, uc_count/total]
 
-def letter_case_distribution_wrapper(dataframe, textcolumn):
+def letter_case_distribution_wrapper(dataframe, feed_string):
     print("Performing letter case distribution...")
     baseline = time.time()
-    dataframe['letter_case_distribution'] = dataframe[textcolumn].apply(letter_case_distribution)
+    dataframe['letter_case_distribution'] = dataframe[feed_string].apply(letter_case_distribution)
     print("Performed letter case distribution in " + str(time.time() - baseline) + " seconds")
     
 #################################################################
@@ -237,10 +321,10 @@ def word_case_distribution(feed):
 
     return [all_lower_word / total_words, first_upper_rest_lower_word / total_words, all_upper_word / total_words, other_word / total_words]
 
-def word_case_distribution_wrapper(dataframe, textcolumn):
+def word_case_distribution_wrapper(dataframe, feed_string):
     print("Performing word case distribution...")
     baseline = time.time()
-    dataframe['word_case_distribution'] = dataframe[textcolumn].apply(word_case_distribution)
+    dataframe['word_case_distribution'] = dataframe[feed_string].apply(word_case_distribution)
     print("Performed word case distribution in " + str(time.time() - baseline) + " seconds")
     
 #################################################################
@@ -253,55 +337,13 @@ def misspelled_prop(feed, spell_instance):
                 misspellings += 1
     return misspellings / len(words)
         
-def misspelled_prop_wrapper(dataframe, textcolumn, newcolumn):
+def misspelled_prop_wrapper(dataframe, feed_string, newcolumn):
     print("Performing misspellings proportion...")
     baseline = time.time()
     spell = Speller(lang='en')
-    dataframe[newcolumn] = dataframe[textcolumn].progress_apply(misspelled_prop, args = (spell,))
+    dataframe[newcolumn] = dataframe[feed_string].progress_apply(misspelled_prop, args = (spell,))
     print("Performed misspellings proportion in " + str(time.time() - baseline) + " seconds")
-    
-#################################################################
 
-def word_ngrams(feed, collection):
-    tw = len(collection)
-    feed_lower = feed.lower()
-    words = word_list(feed, "letters_only")
-    kept_words = []
-    for word in words:
-        if word in collection:
-            kept_words.append(word)
-    kept_words = kept_words + collection
-    kept_words.sort()
-    words_ngram_distro_temp = list(Counter(kept_words).values())
-    words_ngram_distro = [(x-1)/tw for x in words_ngram_distro_temp]
-    return words_ngram_distro
-
-def word_ngrams_wrapper(dataframe, textcolumn, newcolumn, n):
-    print("Performing word " + str(n) + "-gram...")
-    baseline = time.time()
-    sp = spacy.load('en_core_web_sm')
-    stop_words = list(sp.Defaults.stop_words)
-    if n == 1:
-        all_words = []
-        for feed in dataframe[textcolumn]:
-            all_words.append(word_list(feed, "letters_only"))
-        all_words_lower = []
-        for wordlist in all_words:
-            for word in wordlist:
-                all_words_lower.append(word.lower())
-        c = Counter(all_words_lower)
-        keep_counter = 0
-        loop_counter = 0
-        collection = []
-        while keep_counter < 200:
-            curr_word = c.most_common()[loop_counter][0]
-            if curr_word not in stop_words:
-                keep_counter += 1
-                collection.append(curr_word)
-            loop_counter += 1
-    dataframe[newcolumn] = dataframe[textcolumn].progress_apply(word_ngrams, args = (collection,))
-    print("Performed word " + str(n) + "-gram in " + str(time.time() - baseline) + " seconds")
-    
 #################################################################
 #################################################################
 #################################################################
@@ -311,91 +353,108 @@ def word_ngrams_wrapper(dataframe, textcolumn, newcolumn, n):
 #def lemmatizer(feed, lemmatizer_instance):
 #    tokenized features have lemma_ as already. return this if needed.
 
-#def lemmatizer_wrapper(dataframe, textcolumn):
+#def lemmatizer_wrapper(dataframe, feed_string):
 #    lemmatizer_instance = WordNetLemmatizer()
-#    if textcolumn + '_lemmatized' not in dataframe.columns:
+#    if feed_string + '_lemmatized' not in dataframe.columns:
 #        print("Lemmatizing feeds...")
 #        baseline = time.time()
-#        dataframe[textcolumn + '_lemmatized'] = dataframe[textcolumn].apply(lemmatizer, args=(lemmatizer_instance,))
+#        dataframe[feed_string + '_lemmatized'] = dataframe[feed_string].apply(lemmatizer, args=(lemmatizer_instance,))
 #        print("Feeds lemmatized in " + str(time.time() - baseline) + " seconds")
 #    else:
 #        print("Feeds already lemmatized")
     
 #################################################################
 
-def tokenizer(feed, spacy_load):
-    return spacy_load(feed)
+def tokenizer(feed_comment_list, spacy_load):
+    spacy_list = []
+    for comment_tokens in feed_comment_list:
+        spacy_list.append(spacy_load(' '.join(comment_tokens)))
+    return spacy_list
 
-def tokenizer_wrapper(dataframe, textcolumn, spacy_load = None):
+def tokenizer_wrapper(dataframe, feed_comment_list, spacy_load = None):
     if spacy_load == None:
         spacy_load = spacy.load('en_core_web_sm')
-    if textcolumn + '_tokenized' not in dataframe.columns:
+    if feed_comment_list + '_spacy' not in dataframe.columns:
         print("Tokenizing feeds...")
         baseline = time.time()
-        dataframe[textcolumn + '_tokenized'] = dataframe[textcolumn].apply(tokenizer, args=(spacy_load,))
+        dataframe[feed_comment_list + '_spacy'] = dataframe[feed_comment_list].progress_apply(tokenizer, args=(spacy_load,))
         print("Feeds tokenized in " + str(time.time() - baseline) + " seconds")
     else:
         print("Feeds already tokenized")
 
 #################################################################
 
-def POS_tags_ngram(tokens, n, collection):
-    tc = len(tokens)
-    tags = []
-    for token in tokens:
-        #print(f'{token.text:{12}} {token.pos_:{10}} {token.tag_:{8}} {spacy.explain(token.tag_)}')
-        tags.append(token.tag_)
-    ngrams = []
-    for i in range(tc-(n-1)):
-        ngrams.append(tags[i:i+n])
-    ngrams_sortable = []
-    for i in range(len(ngrams)):
-        ngrams_sortable.append('||'.join(ngrams[i]))
-    ngrams_sortable = ngrams_sortable + collection
-    ngrams_sortable.sort()
-    tags_ngram_distro_temp = list(Counter(ngrams_sortable).values())
-    tags_ngram_distro = [(x-1)/tc for x in tags_ngram_distro_temp]
-    return tags_ngram_distro
+def feed_comment_list_spacy_tags(feed_comment_list_spacy):
+    comments_as_tags = []
+    for spacy_doc in feed_comment_list_spacy:
+        comment_as_tags = []
+        for token in spacy_doc:
+            comment_as_tags.append(token.tag_)
+        comments_as_tags.append(comment_as_tags)
+    return comments_as_tags
 
-def POS_tags_ngram_wrapper(dataframe, tokencolumn, newcolumn, n):
-    sp = spacy.load('en_core_web_sm')
-    print("Performing POS tags " + str(n) + "-grams...")
+def POS_tags_ngram_wrapper(dataframe, feed_comment_list_spacy, newcolumn, n, train_collection = None):
     baseline = time.time()
-    collection = sp.pipe_labels['tagger']
-    if n == 1:
-        pass
-    if n == 2:
-        collection = [a + "||" + b for a in collection for b in collection]
-    if n == 3:
-        collection = [a + "||" + b + "||" + c for a in collection for b in collection for c in collection]
-    dataframe[newcolumn] = dataframe[tokencolumn].apply(POS_tags_ngram, args=(n, collection))
-    print("Performed POS tags " + str(n) + "-gram in " + str(time.time() - baseline) + " seconds")
+    if train_collection == None:
+        print("Performing train POS tags " + str(n) + "-grams...")
+        dataframe[feed_comment_list_spacy + "_tags"] = dataframe[feed_comment_list_spacy].apply(feed_comment_list_spacy_tags)
+        master_tag_list = dataframe[feed_comment_list_spacy + "_tags"].apply(pd.Series).stack().tolist()
+        c = Counter("")
+        for comment in master_tag_list:
+            c = c + Counter(list(ngrams(comment, n)))
+        c = c.most_common()
+        upper = 50
+        if len(c) < upper:
+            upper = len(c)
+        upto50_collection = []
+        for i in range(upper):
+            upto50_collection.append(c[i][0])
+        upto50_collection.sort() 
+    if train_collection != None:
+        print("Performing test POS tags " + str(n) + "-gram...")
+        dataframe[feed_comment_list_spacy + "_tags"] = dataframe[feed_comment_list_spacy].apply(feed_comment_list_spacy_tags)
+        upto50_collection = train_collection
+    print(upto50_collection)
+    dataframe[newcolumn] = dataframe[feed_comment_list_spacy + "_tags"].progress_apply(multchar_ngrams, args = (upto50_collection,n))
+    # Return upto50_collection for later use with test set - unless this function WAS being called on the test set!
+    dataframe = dataframe.drop(feed_comment_list_spacy + "_tags", axis=1)
+    if train_collection == None:   
+        print("Performed train POS tags " + str(n) + "-gram in " + str(time.time() - baseline) + " seconds")
+        print("Returned up to 50 most common POS tags " + str(n) + "-grams for feature extraction on test set.")
+        return upto50_collection
+    else:
+        print("Performed test POS tags " + str(n) + "-gram in " + str(time.time() - baseline) + " seconds")
     
 #################################################################
 
-def stop_words_proportion(tokens, collection):
-    tc = len(tokens)
+def stop_words_proportion(feed_comment_list_spacy, collection):
+    tt = 0
+    for comment in feed_comment_list_spacy:
+        tt += len(comment)
     stop_words = 0
-    for token in tokens:
-        if token.text.lower in collection:
-            stop_words += 1
-    return stop_words / tc
+    for comment in feed_comment_list_spacy:
+        for token in comment:
+            if token.text.lower() in collection:
+                stop_words += 1
+    return stop_words / tt
 
-def stop_words_proportion_wrapper(dataframe, tokencolumn, newcolumn):
+def stop_words_proportion_wrapper(dataframe, feed_comment_list_spacy, newcolumn):
     sp = spacy.load('en_core_web_sm')
     print("Performing stop words ratio...")
     baseline = time.time()
     collection = list(sp.Defaults.stop_words)
-    dataframe[newcolumn] = dataframe[tokencolumn].apply(stop_words_proportion, args = (collection,))
+    dataframe[newcolumn] = dataframe[feed_comment_list_spacy].apply(stop_words_proportion, args = (collection,))
     print("Performed stop words ratio in " + str(time.time() - baseline) + " seconds")
     
 #################################################################
 
-def hapax_legomena_proportion(tokens, kind, collection):
+def hapax_legomena_proportion(feed_comment_list_spacy, kind, collection):
     token_texts = []
-    for token in tokens:
-        if str(token.text.lower) not in collection:
-            token_texts.append(token.text)
+    for comment in feed_comment_list_spacy:
+        for token in comment:
+            lower_token_text = token.text.lower()
+            if lower_token_text not in collection:
+                token_texts.append(lower_token_text)
     if kind == 'total':
         denominator = len(token_texts)
     elif kind == 'unique':
@@ -410,21 +469,23 @@ def hapax_legomena_proportion(tokens, kind, collection):
     else:
         return hapleg_token / denominator
 
-def hapax_legomena_proportion_wrapper(dataframe, tokencolumn, newcolumn, kind):
+def hapax_legomena_proportion_wrapper(dataframe, feed_comment_list_spacy, newcolumn, kind):
     print("Performing hapax legomena proportion of " + kind + " tokens...")
     sp = spacy.load('en_core_web_sm')
     collection = list(sp.Defaults.stop_words)
     baseline = time.time()
-    dataframe[newcolumn] = dataframe[tokencolumn].apply(hapax_legomena_proportion, args = (kind,collection))
+    dataframe[newcolumn] = dataframe[feed_comment_list_spacy].apply(hapax_legomena_proportion, args = (kind,collection))
     print("Performed hapax legomena proportion of " + kind + " tokens in " + str(time.time() - baseline) + " seconds")
 
 #################################################################
 
-def token_type_ratio(tokens, collection):
+def token_type_ratio(feed_comment_list_spacy, collection):
     token_texts = []
-    for token in tokens:
-        if str(token.text.lower) not in collection:
-            token_texts.append(token.text)
+    for comment in feed_comment_list_spacy:
+        for token in comment:
+            lower_token_text = token.text.lower()
+            if lower_token_text not in collection:
+                token_texts.append(lower_token_text)
     total = len(token_texts)
     unique = len(list(set(token_texts)))
     if total == 0:
@@ -432,12 +493,12 @@ def token_type_ratio(tokens, collection):
     else:
         return unique / total
 
-def token_type_ratio_wrapper(dataframe, tokencolumn, newcolumn):
+def token_type_ratio_wrapper(dataframe, feed_comment_list_spacy, newcolumn):
     print("Performing token type ratio...")
     baseline = time.time()
     sp = spacy.load('en_core_web_sm')
     collection = list(sp.Defaults.stop_words)
-    dataframe[newcolumn] = dataframe[tokencolumn].apply(token_type_ratio, args = (collection,))
+    dataframe[newcolumn] = dataframe[feed_comment_list_spacy].apply(token_type_ratio, args = (collection,))
     print("Performed token type ratio in " + str(time.time() - baseline) + " seconds")
     
 #################################################################
