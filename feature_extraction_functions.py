@@ -59,7 +59,7 @@ def character_ngrams(feed, collection, n):
         denom = 1
     return [(x-1) / denom for x in result]
 
-def character_ngrams_wrapper(dataframe, feed_token_space, newcolumn, n, kind='letter', train_collection = None):
+def character_ngrams_wrapper(dataframe, feed_token_space, newcolumn, n, collection_size, kind='letter', train_collection = None):
     baseline = time.time()
     if train_collection == None:
         print("Performing train " + kind + " " + str(n) + "-gram...")
@@ -89,9 +89,9 @@ def character_ngrams_wrapper(dataframe, feed_token_space, newcolumn, n, kind='le
                 ngram = token[i:(i+n)].lower()
                 if ngram in collection:
                     ngrams.append(ngram.lower())
-        # Calculate frequencies, keep only the top 50
+        # Calculate frequencies, keep only the top collection_size
         c = Counter(ngrams).most_common()
-        upper = 50
+        upper = collection_size
         if len(c) < upper:
             upper = len(c)
         upto50_collection = []
@@ -137,7 +137,7 @@ def word_ngrams_wrapper(dataframe, feed_comment_list_nopunc_lower, newcolumn, n,
         for comment in master_comment_list:
             c = c + Counter(list(ngrams(comment, n)))
         c = c.most_common()
-        upper = 50
+        upper = collection_size
         if len(c) < upper:
             upper = len(c)
         upto50_collection = []
@@ -403,7 +403,7 @@ def POS_tags_ngram_wrapper(dataframe, feed_comment_list_spacy, newcolumn, n, tra
         for comment in master_tag_list:
             c = c + Counter(list(ngrams(comment, n)))
         c = c.most_common()
-        upper = 50
+        upper = collection_size
         if len(c) < upper:
             upper = len(c)
         upto50_collection = []
