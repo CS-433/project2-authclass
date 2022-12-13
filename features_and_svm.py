@@ -125,11 +125,11 @@ cohort_nonnat = eng_feeds[eng_feeds['proficiency'] == "L"]
 # # Extract Features
 
 # %%
-warnings.filterwarnings("ignore")
+#warnings.filterwarnings("ignore")
 from sklearn.model_selection import train_test_split
 import yaml # for the config file
 from yaml.loader import SafeLoader
-pd.options.mode.chained_assignment = None
+#pd.options.mode.chained_assignment = None
 
 
 team_seed = 13 + 4 + 5
@@ -137,7 +137,7 @@ team_seed = 13 + 4 + 5
 # read config file :
 with open('config_svm.yaml', 'r') as f:
     config = list(yaml.load_all(f, Loader=SafeLoader))
-
+config = config[0]
 n_letter_1gram = config['n_letter_1gram']
 n_letter_2gram = config['n_letter_2gram']
 n_letter_3gram = config['n_letter_3gram']
@@ -154,8 +154,8 @@ n_POS_tag_1gram = config['n_POS_tag_1gram']
 n_POS_tag_2gram = config['n_POS_tag_2gram']
 n_POS_tag_3gram = config['n_POS_tag_3gram']
 
-degree_svm = config['degree']
-C_svm = config['C']
+degree_svm = config['degree_svm']
+C_svm = config['C_svm']
 
 def extract_features(cohort, filetag):
     
@@ -291,9 +291,9 @@ def extract_features(cohort, filetag):
     y_train.to_pickle("dev_" + filetag + "_y_train.pkl")
     y_test.to_pickle("dev_" + filetag + "_y_test.pkl")
 
-extract_features(cohort_all, "cohort_all")
-extract_features(cohort_native, "cohort_native")
-extract_features(cohort_nonnat, "cohort_nonnat")
+#extract_features(cohort_all, "cohort_all")
+#extract_features(cohort_native, "cohort_native")
+#extract_features(cohort_nonnat, "cohort_nonnat")
 
 # %% [markdown]
 # # Train Models
