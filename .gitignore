@@ -6,3 +6,5 @@ paper_tweetLID.pdf
 Data/
 __pycache__
 NLP.run
+eng_feeds
+Outputs/output01.yaml

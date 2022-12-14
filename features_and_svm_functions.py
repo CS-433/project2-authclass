@@ -23,6 +23,7 @@ from sklearn.preprocessing import LabelEncoder
 
 # Raw string version of feeds
 def feed_string(feed):
+    print(feed)
     return ' '.join(feed)
 
 ## Doing this via loop because two columns involved in function instead of one...
@@ -45,11 +46,12 @@ def build_cohorts(n_native,n_nonnat,eng_native,eng_nonnat,seed):
     # Before splitting into cohorts, perform all pre-feature-extraction processing
     eng_feeds = pd.concat([eng_nonnat_sample, eng_native_sample], ignore_index=False, axis=0) # 
     eng_feeds['author'] = eng_feeds.index
-    eng_feeds = pd.wide_to_long(eng_feeds, ["file", "slices"], i="author", j="intra_author_feed_id").sort_index()
-    eng_feeds = eng_feeds.rename(columns={"slices": "comment_lengths", "file": "feed_tokens_space"})
+    eng_feeds = pd.wide_to_long(eng_feeds, ["feed", "slices"], i="author", j="intra_author_feed_id").sort_index()
+    eng_feeds = eng_feeds.rename(columns={"slices": "comment_lengths", "feed": "feed_tokens_space"})
+    eng_feeds.to_parquet('eng_feeds')
 
     # Raw string version of feeds
-    eng_feeds['feed_string'] = eng_feeds['feed_tokens_space'].apply(feed_string)
+    eng_feeds['feed_string'] = eng_feeds['feed_tokens_space'].apply(lambda x: ' '.join(x))
 
     # List-of-comments version of feeds
     eng_feeds['comment_word_indices'] = eng_feeds['comment_lengths'].apply(create_comment_word_indices)
@@ -124,7 +126,7 @@ def extract_features(cohort,config):
     n_word_2gram = config['n_word_2gram']
     n_POS_tag_1gram = config['n_POS_tag_1gram']
     n_POS_tag_2gram = config['n_POS_tag_2gram']
-    n_POS_tag_3gram = config['n_POS_tag_3gram']
+    #n_POS_tag_3gram = config['n_POS_tag_3gram']
 
     seed = config['seed']
     
@@ -198,7 +200,14 @@ def extract_features(cohort,config):
             POS_tags_1gram_collection_fromtrain = POS_tags_ngram_wrapper(feeds_aug, 'feed_comment_list_spacy', 'POS_tag_1gram', 1, n_POS_tag_1gram)
             POS_tags_2gram_collection_fromtrain = POS_tags_ngram_wrapper(feeds_aug, 'feed_comment_list_spacy', 'POS_tag_2gram', 2, n_POS_tag_2gram)
             #POS_tags_3gram_collection_fromtrain = POS_tags_ngram_wrapper(feeds_aug, 'feed_comment_list_spacy', 'POS_tag_3gram', 3, n_POS_tag_3gram)
-        
+            
+            # compute the maximum and the minimum values on the train set to perform a min-max scaling later
+            max_world_avg =  feeds_aug['world_length_avg'].max()
+            max_length_med =  feeds_aug['comment_length_median'].max()
+            min_world_avg =  feeds_aug['world_length_avg'].min()
+            min_length_med =  feeds_aug['comment_length_median'].min()
+
+
         elif stage == "test":
         
             # Letter, Digit, and Punctuation n-grams
@@ -224,6 +233,11 @@ def extract_features(cohort,config):
             POS_tags_ngram_wrapper(feeds_aug, 'feed_comment_list_spacy', 'POS_tag_2gram', 2, n_POS_tag_2gram, POS_tags_2gram_collection_fromtrain)
             #POS_tags_ngram_wrapper(feeds_aug, 'feed_comment_list_spacy', 'POS_tag_3gram', 3, n_POS_tag_3gram, POS_tags_3gram_collection_fromtrain)
 
+        # Perform a min-max normalization using the parameter from the train set
+        feeds_aug['world_length_avg'] = (feeds_aug['world_length_avg']-min_world_avg)/(max_world_avg - min_world_avg)
+        feeds_aug['comment_length_median'] = (feeds_aug['comment_length_median'] - min_length_med)/(max_length_med - min_length_med)
+        
+        
         # IMPORTANT: If any features are commented-in above, they must be added to the feature list in this next line
         # Current state : I removed 'letter_4gram',
         feeds_aug = feeds_aug[['proficiency', 'comment_length_median', 'letter_prop', 'digit_prop', 'punctuation_prop', 'whitespace_prop', 'word_length_avg', 'word_length_distribution', 'word_short_prop', 'letter_case_distribution', 'word_case_distribution', 'misspelled_prop', 'stop_words_proportion', 'hapax_legomena_prop_tot_tokens', 'hapax_legomena_prop_unique_tokens', 'token_type_ratio', 'letter_1gram', 'letter_2gram', 'letter_3gram','digit_1gram', 'punctuation_1gram', 'punctuation_2gram', 'word_1gram', 'word_2gram', 'POS_tag_1gram', 'POS_tag_2gram']]
@@ -494,13 +508,6 @@ def word_count_wrapper(dataframe, feed_string):
 
 #################################################################
 
-def word_length_avg(feed):
-    words = word_list(feed, "letters_only")
-    word_lengths = []
-    for word in words:
-        word_lengths.append(len(word))
-    return sum(word_lengths) / len(word_lengths)
-    
 def word_length_avg_wrapper(dataframe, feed_string):
     print("Performing word length avg...")
     baseline = time.time()
