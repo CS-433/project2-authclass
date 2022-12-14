@@ -4,3 +4,4 @@ Data/processed_comments
 __pycache__/Language_Detection.cpython-310.pyc
 paper_tweetLID.pdf
 Data/
+__pycache__
