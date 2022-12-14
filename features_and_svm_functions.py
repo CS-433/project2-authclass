@@ -40,25 +40,7 @@ def strip_punc_and_lower_nested_list(feed_comment_list):
 def build_cohorts(n_native,n_nonnat,eng_native,eng_nonnat,seed):
     ''' BUild three cohorts : all, native and non-native '''
     eng_native_sample = eng_native.sample(n_native, random_state=seed)
-    eng_nonnat_sample = eng_nonnat.sample(n_nonnat, random_state=seed)
-
-    # Selecting 20 feeds 
-    ### ARTHUR REMOVE THIS ONCE YOU LIMIT TO 20 FEEDS PER AUTHOR ###
-    eng_native_sample = eng_native_sample[['timerange', 'file1', 'slices1', 'file2', 'slices2', 'file3', 'slices3',
-                                           'file4', 'slices4', 'file5', 'slices5', 'file6', 'slices6', 'file7',
-                                           'slices7', 'file8', 'slices8', 'file9', 'slices9', 'file10', 'slices10',
-                                           'file11', 'slices11', 'file12', 'slices12', 'file13', 'slices13',
-                                           'file14', 'slices14', 'file15', 'slices15', 'file16', 'slices16',
-                                           'file17', 'slices17', 'file18', 'slices18', 'file19', 'slices19',
-                                           'file20', 'slices20', 'proficiency']]
-
-    eng_nonnat_sample = eng_nonnat_sample[['timerange', 'file1', 'slices1', 'file2', 'slices2', 'file3', 'slices3',
-                                            'file4', 'slices4', 'file5', 'slices5', 'file6', 'slices6', 'file7',
-                                            'slices7', 'file8', 'slices8', 'file9', 'slices9', 'file10', 'slices10',
-                                            'file11', 'slices11', 'file12', 'slices12', 'file13', 'slices13',
-                                            'file14', 'slices14', 'file15', 'slices15', 'file16', 'slices16',
-                                            'file17', 'slices17', 'file18', 'slices18', 'file19', 'slices19',
-                                            'file20', 'slices20', 'proficiency']]
+    eng_nonnat_sample = eng_nonnat.sample(n_nonnat, random_state=seed)    
 
     # Before splitting into cohorts, perform all pre-feature-extraction processing
     eng_feeds = pd.concat([eng_nonnat_sample, eng_native_sample], ignore_index=False, axis=0) # 
@@ -522,8 +504,7 @@ def word_length_avg(feed):
 def word_length_avg_wrapper(dataframe, feed_string):
     print("Performing word length avg...")
     baseline = time.time()
-    #dataframe['word_length_avg'] = dataframe[feed_string].apply(lambda x: np.mean([len(w) for w in x.split()]))
-    dataframe['word_length_avg'] = dataframe[feed_string].apply(word_length_avg)
+    dataframe['word_length_avg'] = dataframe[feed_string].apply(lambda x: np.mean([len(w) for w in x.split()]))
     print("Performed word length avg in " + str(time.time() - baseline) + " seconds")
     
 #################################################################

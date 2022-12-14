@@ -1,5 +1,4 @@
 import argparse
-import pickle5 as pickle
 from features_and_svm_functions import *
 import warnings
 import yaml # for the config and output files
@@ -18,8 +17,8 @@ with open(path_to_input_file, 'r') as f:
 config = config[0]
 
 ## Load data
-eng_native = pd.read_pickle('dataset/Tunning/30native_english')
-eng_nonnat = pd.read_pickle('dataset/Tunning/30non_native_english')
+eng_native = pd.read_csv('dataset/Tunning/30native_english.csv', sep = '\t', index_col=0)
+eng_nonnat = pd.read_csv('dataset/Tunning/30non_native_english.csv', sep = '\t', index_col=0)
 eng_native['proficiency'] = "N" # N = native
 eng_nonnat['proficiency'] = "L" # L = learner
 
