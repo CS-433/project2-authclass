@@ -1,11 +1,7 @@
 import pandas as pd
 import re
 from collections import Counter
-import nltk
 import time
-nltk.download('wordnet')
-nltk.download('omw-1.4')
-nltk.download('stopwords')
 import string
 import spacy
 from tqdm import tqdm
@@ -19,7 +15,6 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import f1_score
 from sklearn.model_selection import train_test_split
 import statistics
-import yaml # for the config file
 import random as random
 from random import sample
 from sklearn.preprocessing import LabelEncoder
@@ -527,6 +522,7 @@ def word_length_avg(feed):
 def word_length_avg_wrapper(dataframe, feed_string):
     print("Performing word length avg...")
     baseline = time.time()
+    #dataframe['word_length_avg'] = dataframe[feed_string].apply(lambda x: np.mean([len(w) for w in x.split()]))
     dataframe['word_length_avg'] = dataframe[feed_string].apply(word_length_avg)
     print("Performed word length avg in " + str(time.time() - baseline) + " seconds")
     
