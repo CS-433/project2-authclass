@@ -4,6 +4,12 @@ Data/processed_comments
 __pycache__/Language_Detection.cpython-310.pyc
 paper_tweetLID.pdf
 Data/
+__pycache__/feature_extraction_functions.cpython-310.pyc
+__pycache__/features_and_svm_functions.cpython-310.pyc
+Outputs/output01.yaml
+.gitignore
+eng_development_feeds_pre_split.pkl
+testLea.py
 __pycache__
 NLP.run
 eng_feeds
