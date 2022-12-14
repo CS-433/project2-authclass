@@ -52,7 +52,7 @@ with open(path_to_output_file, 'w') as file:
         yaml.dump(result_all, file)
 with open(path_to_output_file, 'a') as file:
         yaml.dump(result_native,file)
-        yaml.dump(result_nonnat)
+        yaml.dump(result_nonnat,file)
 
 #####################################################################################################################
 
