@@ -254,14 +254,17 @@ def extract_features(cohort,config):
         elif stage == "test":
             X_test = feeds_aug
     print("Feature matrix X_train of shape", np.shape(X_train), " has been built")
+    
+        # X_train.to_parquet("dev_" + filetag + "_X_train.pkl")
+        # X_test.to_parquet("dev_" + filetag + "_X_test.pkl")
+        # y_train.to_parquet("dev_" + filetag + "_y_train.pkl")
+        # y_test.to_parquet("dev_" + filetag + "_y_test.pkl")
+
     return X_train,X_test,y_train,y_test
-    #X_train.to_pickle("dev_" + filetag + "_X_train.pkl")
-    #X_test.to_pickle("dev_" + filetag + "_X_test.pkl")
-    #y_train.to_pickle("dev_" + filetag + "_y_train.pkl")
-    #y_test.to_pickle("dev_" + filetag + "_y_test.pkl")
+    
     #return letter_1gram_collection_fromtrain, letter_2gram_collection_fromtrain,letter_3gram_collection_fromtrain,letter_4gram_collection_fromtrain,digit_1gram_collection_fromtrain,digit_2gram_collection_fromtrain, digit_3gram_collection_fromtrain,punctuation_1gram_collection_fromtrain, punctuation_2gram_collection_fromtrain,punctuation_3gram_collection_fromtrain,word_1gram_collection_fromtrain,word_2gram_collection_fromtrain,POS_tags_1gram_collection_fromtrain, POS_tags_2gram_collection_fromtrain, POS_tags_3gram_collection_fromtrain
 
-def classify(filetag, kernel,cohort,config,path_to_output_file):
+def classify(filetag, kernel,cohort,config,n_input):
 
     # Set SVM parameters 
     degree_svm = config['degree_svm']
@@ -269,6 +272,12 @@ def classify(filetag, kernel,cohort,config,path_to_output_file):
 
     # Extract train and test data w features. Split out proficiency.
     X_train,X_test,y_train,y_test = extract_features(cohort,config)
+
+    # Save the feature in a parquet file
+    X_train.to_parquet("features/" + n_input + '_' + filetag + "_X_train")
+    X_test.to_parquet("features/" + n_input + '_' + filetag + "_X_test")
+    y_train.to_parquet("features/" + n_input + '_' + filetag + "_y_train")
+    y_test.to_parquet("features/" + n_input + '_' + filetag + "_y_test")
 
     train_proficiency = X_train['proficiency']
     X_train = X_train.drop(['proficiency'], axis = 1)#

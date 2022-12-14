@@ -44,9 +44,9 @@ cohort_all, cohort_native, cohort_nonnat = build_cohorts(num_native_authors_to_s
 warnings.filterwarnings("ignore")
 pd.options.mode.chained_assignment = None
 
-result_all = classify("cohort_all", "linear",cohort_all,config,path_to_output_file)
-result_native = classify("cohort_native", "linear",cohort_native,config,path_to_output_file)   
-result_nonnat = classify("cohort_nonnat", "linear",cohort_nonnat,config, path_to_output_file)
+result_all = classify("cohort_all", "linear",cohort_all,config,args.N_input)
+result_native = classify("cohort_native", "linear",cohort_native,config,args.N_input)   
+result_nonnat = classify("cohort_nonnat", "linear",cohort_nonnat,config, args.N_input)
 
 with open(path_to_output_file, 'w') as file:
         yaml.dump(result_all, file)
