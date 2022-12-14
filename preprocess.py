@@ -36,7 +36,7 @@ def generate_feeds(df, nb_feeds = 10, nb_words_per_feed = 500, exact = True, day
 
     # Create two columns per file: contents and words per comment
     for i in range(nb_feeds):
-        filename   = 'file' + str(i+1)
+        filename   = 'feed' + str(i+1)
         slice_name = 'slices' + str(i+1)
         dict[filename] = []
         dict[slice_name] = []
@@ -96,7 +96,7 @@ def generate_feeds(df, nb_feeds = 10, nb_words_per_feed = 500, exact = True, day
             
             # Store all the files and words per comment in separate columns
             for i in range(nb_feeds):
-                filename   = 'file' + str(i+1)
+                filename   = 'feed' + str(i+1)
                 slice_name = 'slices' + str(i+1)
                 dict[filename].append(files[i])
                 dict[slice_name].append(words_per_comment[i])
