@@ -1,11 +1,7 @@
 import pandas as pd
 import re
 from collections import Counter
-import nltk
 import time
-nltk.download('wordnet')
-nltk.download('omw-1.4')
-nltk.download('stopwords')
 import string
 import spacy
 from tqdm import tqdm
@@ -19,7 +15,6 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import f1_score
 from sklearn.model_selection import train_test_split
 import statistics
-import yaml # for the config file
 import random as random
 from random import sample
 from sklearn.preprocessing import LabelEncoder
@@ -28,6 +23,7 @@ from sklearn.preprocessing import LabelEncoder
 
 # Raw string version of feeds
 def feed_string(feed):
+    print(feed)
     return ' '.join(feed)
 
 ## Doing this via loop because two columns involved in function instead of one...
@@ -45,34 +41,17 @@ def strip_punc_and_lower_nested_list(feed_comment_list):
 def build_cohorts(n_native,n_nonnat,eng_native,eng_nonnat,seed):
     ''' BUild three cohorts : all, native and non-native '''
     eng_native_sample = eng_native.sample(n_native, random_state=seed)
-    eng_nonnat_sample = eng_nonnat.sample(n_nonnat, random_state=seed)
-
-    # Selecting 20 feeds 
-    ### ARTHUR REMOVE THIS ONCE YOU LIMIT TO 20 FEEDS PER AUTHOR ###
-    eng_native_sample = eng_native_sample[['timerange', 'file1', 'slices1', 'file2', 'slices2', 'file3', 'slices3',
-                                           'file4', 'slices4', 'file5', 'slices5', 'file6', 'slices6', 'file7',
-                                           'slices7', 'file8', 'slices8', 'file9', 'slices9', 'file10', 'slices10',
-                                           'file11', 'slices11', 'file12', 'slices12', 'file13', 'slices13',
-                                           'file14', 'slices14', 'file15', 'slices15', 'file16', 'slices16',
-                                           'file17', 'slices17', 'file18', 'slices18', 'file19', 'slices19',
-                                           'file20', 'slices20', 'proficiency']]
-
-    eng_nonnat_sample = eng_nonnat_sample[['timerange', 'file1', 'slices1', 'file2', 'slices2', 'file3', 'slices3',
-                                            'file4', 'slices4', 'file5', 'slices5', 'file6', 'slices6', 'file7',
-                                            'slices7', 'file8', 'slices8', 'file9', 'slices9', 'file10', 'slices10',
-                                            'file11', 'slices11', 'file12', 'slices12', 'file13', 'slices13',
-                                            'file14', 'slices14', 'file15', 'slices15', 'file16', 'slices16',
-                                            'file17', 'slices17', 'file18', 'slices18', 'file19', 'slices19',
-                                            'file20', 'slices20', 'proficiency']]
+    eng_nonnat_sample = eng_nonnat.sample(n_nonnat, random_state=seed)    
 
     # Before splitting into cohorts, perform all pre-feature-extraction processing
     eng_feeds = pd.concat([eng_nonnat_sample, eng_native_sample], ignore_index=False, axis=0) # 
     eng_feeds['author'] = eng_feeds.index
-    eng_feeds = pd.wide_to_long(eng_feeds, ["file", "slices"], i="author", j="intra_author_feed_id").sort_index()
-    eng_feeds = eng_feeds.rename(columns={"slices": "comment_lengths", "file": "feed_tokens_space"})
+    eng_feeds = pd.wide_to_long(eng_feeds, ["feed", "slices"], i="author", j="intra_author_feed_id").sort_index()
+    eng_feeds = eng_feeds.rename(columns={"slices": "comment_lengths", "feed": "feed_tokens_space"})
+    eng_feeds.to_parquet('eng_feeds')
 
     # Raw string version of feeds
-    eng_feeds['feed_string'] = eng_feeds['feed_tokens_space'].apply(feed_string)
+    eng_feeds['feed_string'] = eng_feeds['feed_tokens_space'].apply(lambda x: ' '.join(x))
 
     # List-of-comments version of feeds
     eng_feeds['comment_word_indices'] = eng_feeds['comment_lengths'].apply(create_comment_word_indices)
@@ -131,12 +110,13 @@ def build_cohorts(n_native,n_nonnat,eng_native,eng_nonnat,seed):
     return cohort_all,cohort_native,cohort_nonnat
 
 
-def extract_features(cohort,config):
+def extract_features(cohort,config,filetag):
+
     # Set parameters according to config (dictionnary)
     n_letter_1gram = config['n_letter_1gram']
     n_letter_2gram = config['n_letter_2gram']
     n_letter_3gram = config['n_letter_3gram']
-    #n_letter_4gram = config['n_letter_4gram']
+    n_letter_4gram = config['n_letter_4gram']
     n_digit_1gram  = config['n_digit_1gram']
     #n_digit_2gram = config['n_digit_2gram']
     #n_digit_3gram = config['n_digit_3gram']
@@ -147,10 +127,10 @@ def extract_features(cohort,config):
     n_word_2gram = config['n_word_2gram']
     n_POS_tag_1gram = config['n_POS_tag_1gram']
     n_POS_tag_2gram = config['n_POS_tag_2gram']
-    n_POS_tag_3gram = config['n_POS_tag_3gram']
+    #n_POS_tag_3gram = config['n_POS_tag_3gram']
 
     seed = config['seed']
-    
+
     y = cohort[['author_id', 'intra_author_feed_id']]
     X_train, X_test, y_train, y_test = train_test_split(cohort, y, test_size=0.10, stratify = y['author_id'], random_state=seed)
 
@@ -203,7 +183,7 @@ def extract_features(cohort,config):
             letter_1gram_collection_fromtrain = character_ngrams_wrapper(feeds_aug, 'feed_tokens_space', 'letter_1gram', 1, n_letter_1gram, 'letter')
             letter_2gram_collection_fromtrain = character_ngrams_wrapper(feeds_aug, 'feed_tokens_space', 'letter_2gram', 2, n_letter_2gram, 'letter')
             letter_3gram_collection_fromtrain = character_ngrams_wrapper(feeds_aug, 'feed_tokens_space', 'letter_3gram', 3, n_letter_3gram, 'letter')
-            #letter_4gram_collection_fromtrain = character_ngrams_wrapper(feeds_aug, 'feed_tokens_space', 'letter_4gram', 4, n_letter_4gram, 'letter')
+            letter_4gram_collection_fromtrain = character_ngrams_wrapper(feeds_aug, 'feed_tokens_space', 'letter_4gram', 4, n_letter_4gram, 'letter')
 
             digit_1gram_collection_fromtrain = character_ngrams_wrapper(feeds_aug, 'feed_tokens_space', 'digit_1gram', 1, n_digit_1gram, 'digit')
             #digit_2gram_collection_fromtrain = character_ngrams_wrapper(feeds_aug, 'feed_tokens_space', 'digit_2gram', 2, n_digit_2gram, 'digit')
@@ -221,14 +201,21 @@ def extract_features(cohort,config):
             POS_tags_1gram_collection_fromtrain = POS_tags_ngram_wrapper(feeds_aug, 'feed_comment_list_spacy', 'POS_tag_1gram', 1, n_POS_tag_1gram)
             POS_tags_2gram_collection_fromtrain = POS_tags_ngram_wrapper(feeds_aug, 'feed_comment_list_spacy', 'POS_tag_2gram', 2, n_POS_tag_2gram)
             #POS_tags_3gram_collection_fromtrain = POS_tags_ngram_wrapper(feeds_aug, 'feed_comment_list_spacy', 'POS_tag_3gram', 3, n_POS_tag_3gram)
-        
+            
+            # compute the maximum and the minimum values on the train set to perform a min-max scaling later
+            max_word_avg =  feeds_aug['word_length_avg'].max()
+            max_length_med =  feeds_aug['comment_length_median'].max()
+            min_word_avg =  feeds_aug['word_length_avg'].min()
+            min_length_med =  feeds_aug['comment_length_median'].min()
+
+
         elif stage == "test":
         
             # Letter, Digit, and Punctuation n-grams
             character_ngrams_wrapper(feeds_aug, 'feed_tokens_space', 'letter_1gram', 1, n_letter_1gram, 'letter', letter_1gram_collection_fromtrain)
             character_ngrams_wrapper(feeds_aug, 'feed_tokens_space', 'letter_2gram', 2, n_letter_2gram, 'letter', letter_2gram_collection_fromtrain)
             character_ngrams_wrapper(feeds_aug, 'feed_tokens_space', 'letter_3gram', 3, n_letter_3gram, 'letter', letter_3gram_collection_fromtrain)
-            #character_ngrams_wrapper(feeds_aug, 'feed_tokens_space', 'letter_4gram', 4, n_letter_4gram, 'letter', letter_4gram_collection_fromtrain)
+            character_ngrams_wrapper(feeds_aug, 'feed_tokens_space', 'letter_4gram', 4, n_letter_4gram, 'letter', letter_4gram_collection_fromtrain)
 
             character_ngrams_wrapper(feeds_aug, 'feed_tokens_space', 'digit_1gram', 1, n_digit_1gram, 'digit', digit_1gram_collection_fromtrain)
             #character_ngrams_wrapper(feeds_aug, 'feed_tokens_space', 'digit_2gram', 2, n_digit_2gram, 'digit', digit_2gram_collection_fromtrain)
@@ -247,9 +234,14 @@ def extract_features(cohort,config):
             POS_tags_ngram_wrapper(feeds_aug, 'feed_comment_list_spacy', 'POS_tag_2gram', 2, n_POS_tag_2gram, POS_tags_2gram_collection_fromtrain)
             #POS_tags_ngram_wrapper(feeds_aug, 'feed_comment_list_spacy', 'POS_tag_3gram', 3, n_POS_tag_3gram, POS_tags_3gram_collection_fromtrain)
 
+        # Perform a min-max normalization using the parameter from the train set
+        feeds_aug['word_length_avg'] = (feeds_aug['word_length_avg']-min_word_avg)/(max_word_avg - min_word_avg)
+        feeds_aug['comment_length_median'] = (feeds_aug['comment_length_median'] - min_length_med)/(max_length_med - min_length_med)
+        
+        
         # IMPORTANT: If any features are commented-in above, they must be added to the feature list in this next line
-        # Current state : I removed 'letter_4gram',
-        feeds_aug = feeds_aug[['proficiency', 'comment_length_median', 'letter_prop', 'digit_prop', 'punctuation_prop', 'whitespace_prop', 'word_length_avg', 'word_length_distribution', 'word_short_prop', 'letter_case_distribution', 'word_case_distribution', 'misspelled_prop', 'stop_words_proportion', 'hapax_legomena_prop_tot_tokens', 'hapax_legomena_prop_unique_tokens', 'token_type_ratio', 'letter_1gram', 'letter_2gram', 'letter_3gram','digit_1gram', 'punctuation_1gram', 'punctuation_2gram', 'word_1gram', 'word_2gram', 'POS_tag_1gram', 'POS_tag_2gram']]
+        # Current state : I removed /,
+        feeds_aug = feeds_aug[['proficiency', 'comment_length_median', 'letter_prop', 'digit_prop', 'punctuation_prop', 'whitespace_prop', 'word_length_avg', 'word_length_distribution', 'word_short_prop', 'letter_case_distribution', 'word_case_distribution', 'misspelled_prop', 'stop_words_proportion', 'hapax_legomena_prop_tot_tokens', 'hapax_legomena_prop_unique_tokens', 'token_type_ratio', 'letter_1gram', 'letter_2gram', 'letter_3gram','letter_4gram','digit_1gram', 'punctuation_1gram', 'punctuation_2gram', 'word_1gram', 'word_2gram', 'POS_tag_1gram', 'POS_tag_2gram']]
         for col in feeds_aug.columns:
             if type(feeds_aug[col].iloc[0]) == list:
                 newcols = [col + "_" + str(i) for i in range(1,len(feeds_aug[col].iloc[0]) + 1)]
@@ -263,21 +255,20 @@ def extract_features(cohort,config):
         elif stage == "test":
             X_test = feeds_aug
     print("Feature matrix X_train of shape", np.shape(X_train), " has been built")
+    
+    X_train.to_parquet("X_train"+filetag)
+    X_test.to_parquet("X_test"+filetag)
+    y_train.to_parquet("y_train"+filetag)
+    y_test.to_parquet("y_test"+filetag)
+    
     return X_train,X_test,y_train,y_test
-    #X_train.to_pickle("dev_" + filetag + "_X_train.pkl")
-    #X_test.to_pickle("dev_" + filetag + "_X_test.pkl")
-    #y_train.to_pickle("dev_" + filetag + "_y_train.pkl")
-    #y_test.to_pickle("dev_" + filetag + "_y_test.pkl")
     #return letter_1gram_collection_fromtrain, letter_2gram_collection_fromtrain,letter_3gram_collection_fromtrain,letter_4gram_collection_fromtrain,digit_1gram_collection_fromtrain,digit_2gram_collection_fromtrain, digit_3gram_collection_fromtrain,punctuation_1gram_collection_fromtrain, punctuation_2gram_collection_fromtrain,punctuation_3gram_collection_fromtrain,word_1gram_collection_fromtrain,word_2gram_collection_fromtrain,POS_tags_1gram_collection_fromtrain, POS_tags_2gram_collection_fromtrain, POS_tags_3gram_collection_fromtrain
 
-def classify(filetag, kernel,cohort,config,path_to_output_file):
+def classify(filetag, kernel,config,X_train,X_test,y_train,y_test):
 
     # Set SVM parameters 
     degree_svm = config['degree_svm']
     C_svm = config['C_svm']
-
-    # Extract train and test data w features. Split out proficiency.
-    X_train,X_test,y_train,y_test = extract_features(cohort,config)
 
     train_proficiency = X_train['proficiency']
     X_train = X_train.drop(['proficiency'], axis = 1)#
@@ -517,17 +508,10 @@ def word_count_wrapper(dataframe, feed_string):
 
 #################################################################
 
-def word_length_avg(feed):
-    words = word_list(feed, "letters_only")
-    word_lengths = []
-    for word in words:
-        word_lengths.append(len(word))
-    return sum(word_lengths) / len(word_lengths)
-    
 def word_length_avg_wrapper(dataframe, feed_string):
     print("Performing word length avg...")
     baseline = time.time()
-    dataframe['word_length_avg'] = dataframe[feed_string].apply(word_length_avg)
+    dataframe['word_length_avg'] = dataframe[feed_string].apply(lambda x: np.mean([len(w) for w in x.split()]))
     print("Performed word length avg in " + str(time.time() - baseline) + " seconds")
     
 #################################################################

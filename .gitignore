@@ -11,3 +11,8 @@ Outputs/output01.yaml
 eng_development_feeds_pre_split.pkl
 testLea.py
 __pycache__
+hyperparameter_tuning_kaede.ipynb
+hyperparameter_tuning_function.py
+NLP.run
+eng_feeds
+Outputs/output01.yaml
