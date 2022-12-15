@@ -1,0 +1,14 @@
+C_svm: 1
+degree_svm: 3
+n_POS_tag_1gram: 50
+n_POS_tag_2gram: 50
+n_digit_1gram: 50
+n_letter_1gram: 200
+n_letter_2gram: 50
+n_letter_3gram: 50
+n_letter_4gram: 50
+n_punctuation_1gram: 50
+n_punctuation_2gram: 50
+n_word_1gram: 50
+n_word_2gram: 50
+seed: 22
