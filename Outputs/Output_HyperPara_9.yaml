@@ -1,12 +1,12 @@
 Model cohort_all:
   Accuracy:
-    Native: '73.33'
+    Native: '70.00'
     Non_Native: '80.00'
-    Overall: '76.67'
+    Overall: '75.00'
   F1:
-    Native: '75.78'
-    Non_Native: '80.00'
-    Overall: '75.89'
+    Native: '72.67'
+    Non_Native: '81.33'
+    Overall: '74.78'
   Infos:
     Model_Kernel: linear
     Nb_Feeds_test: '60'
@@ -15,13 +15,13 @@ Model cohort_all:
     Nb_Non_Native: '15'
 Model cohort_native:
   Accuracy:
-    Native: '60.00'
+    Native: '65.00'
     Non_Native: '0.00'
-    Overall: '60.00'
+    Overall: '65.00'
   F1:
-    Native: '56.57'
+    Native: '62.35'
     Non_Native: '0.00'
-    Overall: '56.57'
+    Overall: '62.35'
   Infos:
     Model_Kernel: linear
     Nb_Feeds_test: '60'
@@ -35,8 +35,8 @@ Model cohort_nonnat:
     Overall: '60.00'
   F1:
     Native: '0.00'
-    Non_Native: '57.40'
-    Overall: '57.40'
+    Non_Native: '58.57'
+    Overall: '58.57'
   Infos:
     Model_Kernel: linear
     Nb_Feeds_test: '60'

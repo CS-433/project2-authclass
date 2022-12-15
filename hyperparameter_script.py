@@ -17,16 +17,15 @@ with open(path_to_input_file, 'r') as f:
 config = config[0]
 
 keys = np.fromiter(config.values(), dtype=float)
-keys[5]=200 # we ignore letter_1gram 
-keys[0]=200 # ignore svm C
-keys[2]=200 # ignore POS_1_gram
-keys[4]=200 # ignore digit_1_gram, stays to 10 all the time
-keys[9]=200 # ignore punctuation 1 gram : constant to 36
-keys[13]=200# ignore seed
+keys[0]=200
+keys[1]=200
+keys[2]=200
+keys[4]=200
+keys[5]=200
+keys[9]=200
+keys[13]=200
 pos = np.argwhere(keys!=200).item()
 var = str(list(config.keys())[pos])[2:]
-
-print('Variation of param ',var,'to ',config['n_'+var])
 
 ## Load train/test data 
 path_to_dataset = 'dataset/Tunning/'

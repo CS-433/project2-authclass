@@ -1,5 +1,5 @@
-C_svm: 3
-degree_svm: 200
+C_svm: 4
+degree_svm: 3
 n_POS_tag_1gram: 48
 n_POS_tag_2gram: 200
 n_digit_1gram: 10
@@ -11,4 +11,4 @@ n_punctuation_1gram: 36
 n_punctuation_2gram: 200
 n_word_1gram: 100
 n_word_2gram: 200
-seed: 1
+seed: 22
