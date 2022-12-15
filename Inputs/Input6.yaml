@@ -5,7 +5,7 @@ n_POS_tag_2gram: 50
 n_digit_1gram: 50
 n_letter_1gram: 50
 n_letter_2gram: 50
-n_letter_3gram: 50
+n_letter_3gram: 200
 n_letter_4gram: 50
 n_punctuation_1gram: 50
 n_punctuation_2gram: 50

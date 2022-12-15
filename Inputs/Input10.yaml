@@ -2,7 +2,7 @@ C_svm: 1
 degree_svm: 3
 n_POS_tag_1gram: 50
 n_POS_tag_2gram: 50
-n_digit_1gram: 50
+n_digit_1gram: 20
 n_letter_1gram: 50
 n_letter_2gram: 50
 n_letter_3gram: 50

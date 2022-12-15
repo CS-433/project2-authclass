@@ -17,8 +17,8 @@ with open(path_to_input_file, 'r') as f:
 config = config[0]
 
 ## Load data
-eng_native = pd.read_parquet('dataset/Tunning/30native_english')
-eng_nonnat = pd.read_parquet('dataset/Tunning/30non_native_english')
+eng_native = pd.read_parquet('dataset/Tunning/30native_english',engine='fastparquet')
+eng_nonnat = pd.read_parquet('dataset/Tunning/30non_native_english',engine='fastparquet')
 eng_native['proficiency'] = "N" # N = native
 eng_nonnat['proficiency'] = "L" # L = learner
 
@@ -44,9 +44,13 @@ cohort_all, cohort_native, cohort_nonnat = build_cohorts(num_native_authors_to_s
 warnings.filterwarnings("ignore")
 pd.options.mode.chained_assignment = None
 
-result_all = classify("cohort_all", "linear",cohort_all,config)
-result_native = classify("cohort_native", "linear",cohort_native,config)   
-result_nonnat = classify("cohort_nonnat", "linear",cohort_nonnat,config)
+X_train_all,X_test_all,y_train_all,y_test_all= extract_features(cohort_all,config,"cohort_all")
+X_train_native,X_test_native,y_train_native,y_test_native= extract_features(cohort_native,config,"cohort_native")
+X_train_nonnat,X_test_nonnat,y_train_nonnat,y_test_nonnat= extract_features(cohort_nonnat,config,"cohort_nonnat")
+
+result_all = classify("cohort_all", "linear",config,X_train_all,X_test_all,y_train_all,y_test_all)
+result_native = classify("cohort_native", "linear",config,X_train_native,X_test_native,y_train_native,y_test_native)   
+result_nonnat = classify("cohort_nonnat", "linear",config,X_train_nonnat,X_test_nonnat,y_train_nonnat,y_test_nonnat)
 
 with open(path_to_output_file, 'w') as file:
         yaml.dump(result_all, file)

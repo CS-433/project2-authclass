@@ -27,10 +27,10 @@ listKeys = ['n_letter_1gram','n_letter_2gram','n_letter_3gram','n_letter_4gram',
             'n_word_2gram','n_POS_tag_1gram','n_POS_tag_2gram','degree_svm','C_svm','seed']
 
 
-hyperparameters = [20,50,100,200]
+hyperparameters = [20,100,200]
 id = 0
 listValues_tmp = listValues[:]  # copy and not assignment 
-for j in range(11):
+for j in range(1,10):
     for hp in hyperparameters:
         id +=1 
         path_to_input_file = 'Inputs/Input'+str(id)+'.yaml'
