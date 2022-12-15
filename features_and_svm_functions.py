@@ -182,7 +182,7 @@ def extract_features(cohort,config,filetag):
             letter_1gram_collection_fromtrain = character_ngrams_wrapper(feeds_aug, 'feed_tokens_space', 'letter_1gram', 1, n_letter_1gram, 'letter')
             letter_2gram_collection_fromtrain = character_ngrams_wrapper(feeds_aug, 'feed_tokens_space', 'letter_2gram', 2, n_letter_2gram, 'letter')
             letter_3gram_collection_fromtrain = character_ngrams_wrapper(feeds_aug, 'feed_tokens_space', 'letter_3gram', 3, n_letter_3gram, 'letter')
-            #letter_4gram_collection_fromtrain = character_ngrams_wrapper(feeds_aug, 'feed_tokens_space', 'letter_4gram', 4, n_letter_4gram, 'letter')
+            letter_4gram_collection_fromtrain = character_ngrams_wrapper(feeds_aug, 'feed_tokens_space', 'letter_4gram', 4, n_letter_4gram, 'letter')
 
             digit_1gram_collection_fromtrain = character_ngrams_wrapper(feeds_aug, 'feed_tokens_space', 'digit_1gram', 1, n_digit_1gram, 'digit')
             #digit_2gram_collection_fromtrain = character_ngrams_wrapper(feeds_aug, 'feed_tokens_space', 'digit_2gram', 2, n_digit_2gram, 'digit')
@@ -214,7 +214,7 @@ def extract_features(cohort,config,filetag):
             character_ngrams_wrapper(feeds_aug, 'feed_tokens_space', 'letter_1gram', 1, n_letter_1gram, 'letter', letter_1gram_collection_fromtrain)
             character_ngrams_wrapper(feeds_aug, 'feed_tokens_space', 'letter_2gram', 2, n_letter_2gram, 'letter', letter_2gram_collection_fromtrain)
             character_ngrams_wrapper(feeds_aug, 'feed_tokens_space', 'letter_3gram', 3, n_letter_3gram, 'letter', letter_3gram_collection_fromtrain)
-            #character_ngrams_wrapper(feeds_aug, 'feed_tokens_space', 'letter_4gram', 4, n_letter_4gram, 'letter', letter_4gram_collection_fromtrain)
+            character_ngrams_wrapper(feeds_aug, 'feed_tokens_space', 'letter_4gram', 4, n_letter_4gram, 'letter', letter_4gram_collection_fromtrain)
 
             character_ngrams_wrapper(feeds_aug, 'feed_tokens_space', 'digit_1gram', 1, n_digit_1gram, 'digit', digit_1gram_collection_fromtrain)
             #character_ngrams_wrapper(feeds_aug, 'feed_tokens_space', 'digit_2gram', 2, n_digit_2gram, 'digit', digit_2gram_collection_fromtrain)
@@ -239,8 +239,8 @@ def extract_features(cohort,config,filetag):
         
         
         # IMPORTANT: If any features are commented-in above, they must be added to the feature list in this next line
-        # Current state : I removed 'letter_4gram',
-        feeds_aug = feeds_aug[['proficiency', 'comment_length_median', 'letter_prop', 'digit_prop', 'punctuation_prop', 'whitespace_prop', 'word_length_avg', 'word_length_distribution', 'word_short_prop', 'letter_case_distribution', 'word_case_distribution', 'misspelled_prop', 'stop_words_proportion', 'hapax_legomena_prop_tot_tokens', 'hapax_legomena_prop_unique_tokens', 'token_type_ratio', 'letter_1gram', 'letter_2gram', 'letter_3gram','digit_1gram', 'punctuation_1gram', 'punctuation_2gram', 'word_1gram', 'word_2gram', 'POS_tag_1gram', 'POS_tag_2gram']]
+        # Current state : I removed /,
+        feeds_aug = feeds_aug[['proficiency', 'comment_length_median', 'letter_prop', 'digit_prop', 'punctuation_prop', 'whitespace_prop', 'word_length_avg', 'word_length_distribution', 'word_short_prop', 'letter_case_distribution', 'word_case_distribution', 'misspelled_prop', 'stop_words_proportion', 'hapax_legomena_prop_tot_tokens', 'hapax_legomena_prop_unique_tokens', 'token_type_ratio', 'letter_1gram', 'letter_2gram', 'letter_3gram','letter_4gram','digit_1gram', 'punctuation_1gram', 'punctuation_2gram', 'word_1gram', 'word_2gram', 'POS_tag_1gram', 'POS_tag_2gram']]
         for col in feeds_aug.columns:
             if type(feeds_aug[col].iloc[0]) == list:
                 newcols = [col + "_" + str(i) for i in range(1,len(feeds_aug[col].iloc[0]) + 1)]
