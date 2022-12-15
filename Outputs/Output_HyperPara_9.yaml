@@ -1,0 +1,45 @@
+Model cohort_all:
+  Accuracy:
+    Native: '73.33'
+    Non_Native: '80.00'
+    Overall: '76.67'
+  F1:
+    Native: '75.78'
+    Non_Native: '80.00'
+    Overall: '75.89'
+  Infos:
+    Model_Kernel: linear
+    Nb_Feeds_test: '60'
+    Nb_Feeds_train: '540'
+    Nb_Natives: '15'
+    Nb_Non_Native: '15'
+Model cohort_native:
+  Accuracy:
+    Native: '60.00'
+    Non_Native: '0.00'
+    Overall: '60.00'
+  F1:
+    Native: '56.57'
+    Non_Native: '0.00'
+    Overall: '56.57'
+  Infos:
+    Model_Kernel: linear
+    Nb_Feeds_test: '60'
+    Nb_Feeds_train: '540'
+    Nb_Natives: '30'
+    Nb_Non_Native: '0'
+Model cohort_nonnat:
+  Accuracy:
+    Native: '0.00'
+    Non_Native: '60.00'
+    Overall: '60.00'
+  F1:
+    Native: '0.00'
+    Non_Native: '57.40'
+    Overall: '57.40'
+  Infos:
+    Model_Kernel: linear
+    Nb_Feeds_test: '60'
+    Nb_Feeds_train: '540'
+    Nb_Natives: '0'
+    Nb_Non_Native: '30'

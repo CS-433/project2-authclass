@@ -111,6 +111,7 @@ def build_cohorts(n_native,n_nonnat,eng_native,eng_nonnat,seed):
 
 
 def extract_features(cohort,config,filetag):
+
     # Set parameters according to config (dictionnary)
     n_letter_1gram = config['n_letter_1gram']
     n_letter_2gram = config['n_letter_2gram']
