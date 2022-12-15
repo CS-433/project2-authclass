@@ -17,8 +17,8 @@ with open(path_to_input_file, 'r') as f:
 config = config[0]
 
 ## Load data
-eng_native = pd.read_pickle('Data/Classified/native_english_40feeds')
-eng_nonnat = pd.read_pickle('Data/Classified/non_native_english_40feeds')
+eng_native = pd.read_parquet('dataset/Tunning/30native_english')
+eng_nonnat = pd.read_parquet('dataset/Tunning/30non_native_english')
 eng_native['proficiency'] = "N" # N = native
 eng_nonnat['proficiency'] = "L" # L = learner
 
@@ -52,7 +52,7 @@ with open(path_to_output_file, 'w') as file:
         yaml.dump(result_all, file)
 with open(path_to_output_file, 'a') as file:
         yaml.dump(result_native,file)
-        yaml.dump(result_nonnat,file)
+        yaml.dump(result_nonnat, file)
 
 #####################################################################################################################
 

@@ -13,3 +13,6 @@ testLea.py
 __pycache__
 hyperparameter_tuning_kaede.ipynb
 hyperparameter_tuning_function.py
+NLP.run
+eng_feeds
+Outputs/output01.yaml
