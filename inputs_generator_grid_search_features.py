@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.model_selection import ParameterGrid
 import pandas as pd
 
-penalty                 = np.array(['l2'])
+penalty                 = np.array([2])
 C_svm                   = np.array([3])
 seed                    = np.array([22])
 letter_1gram_range      = np.array([13,26])
@@ -22,14 +22,14 @@ POS_tag_2gram_range     = np.array([20,100,500])
 listKeys = ['C_svm',
             'n_POS_tag_1gram',
             'n_letter_2gram',
-            'degree_svm',
             'n_digit_1gram',
             'n_letter_1gram',
             'n_letter_3gram',
             'n_letter_4gram',
-            'n_punctuation_2gram',
-            'n_punctuation_1gram',
             'n_word_1gram',
+            'penalty',
+            'n_punctuation_1gram',
+            'n_punctuation_2gram',
             'seed',
             'n_word_2gram',
             'n_POS_tag_2gram']
@@ -53,16 +53,15 @@ grid = ParameterGrid(param_grid)
 id = 0
 list_of_dicts = []
 for dicts in grid :
-    #id+=1
-    #path_to_input_file = 'Inputs/Grid_Search_Features/Input'+str(id)+'.yaml'
+    id+=1
+    path_to_input_file = 'Inputs/Grid_Search_Features/Input'+str(id)+'.yaml'
     listValues = list(dicts.values())
     arrayValues = np.array(listValues)
     listValues = arrayValues.tolist()
     features_param = {listKeys[i]: listValues[i] for i in range(0, len(listKeys), 1)}
     list_of_dicts.append(features_param)
-    #with open(path_to_input_file, 'w') as file:
-    #    yaml.dump(features_param, file) 
-    #if id==3: break
+    with open(path_to_input_file, 'w') as file:
+        yaml.dump(features_param, file) 
 
 df = pd.DataFrame(list_of_dicts)
 df.to_pickle('Inputs/Grid_Search_Features/inputs_df')

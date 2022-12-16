@@ -1,10 +1,9 @@
 import warnings
 warnings.filterwarnings("ignore")
-from linear_search_features_function import *
+from grid_search_features_functions import *
 import argparse
 import yaml
 from yaml.loader import SafeLoader
-import numpy as np
 
 ## Parse command line arguments to know which input file to read and which output file to create
 parser = argparse.ArgumentParser()
@@ -33,9 +32,9 @@ X_test_nonnat = pd.read_parquet(path_to_dataset+'X_test_cohort_nonnat_500',engin
 y_train_nonnat = pd.read_parquet(path_to_dataset+'y_train_cohort_nonnat_500',engine='fastparquet')
 y_test_nonnat = pd.read_parquet(path_to_dataset+'y_test_cohort_nonnat_500',engine='fastparquet')
 
-result_all = change_one_hyperparameter('cohort_all',config,X_train_all,X_test_all,y_train_all,y_test_all)
-result_native = change_one_hyperparameter('cohort_native',config,X_train_native,X_test_native,y_train_native,y_test_native)
-result_nonnat = change_one_hyperparameter('cohort_nonnat',config,X_train_nonnat,X_test_nonnat,y_train_nonnat,y_test_nonnat)
+result_all = classify_grid_search('cohort_all',config,X_train_all,X_test_all,y_train_all,y_test_all)
+result_native = classify_grid_search('cohort_native',config,X_train_native,X_test_native,y_train_native,y_test_native)
+result_nonnat = classify_grid_search('cohort_nonnat',config,X_train_nonnat,X_test_nonnat,y_train_nonnat,y_test_nonnat)
 
 with open(path_to_output_file, 'w') as file:
         yaml.dump(result_all, file)
