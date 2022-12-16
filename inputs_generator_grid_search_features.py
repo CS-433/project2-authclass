@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.model_selection import ParameterGrid
 import pandas as pd
 
-degree_svm              = np.array([1])
+penalty                 = np.array(['l2'])
 C_svm                   = np.array([3])
 seed                    = np.array([22])
 letter_1gram_range      = np.array([13,26])
@@ -36,7 +36,7 @@ listKeys = ['C_svm',
 
 param_grid = {'seed': seed,
               'C_svm':C_svm,
-              'degree_svm':degree_svm,
+              'penalty':penalty,
               'letter_1gram_range':letter_1gram_range,
               'letter_2gram_range':letter_2gram_range,
               'letter_3gram_range': letter_3gram_range,

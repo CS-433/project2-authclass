@@ -8,8 +8,8 @@ import numpy as np
 parser = argparse.ArgumentParser()
 parser.add_argument("Ninput", help="read input file n°Ninput")
 args = parser.parse_args()
-path_to_input_file = 'Inputs/Linear_Search_Features/Input'+args.Ninput+'.yaml'
-path_to_output_file = 'Outputs/Linear_Search_Features/Output_HyperPara_'+args.Ninput+'.yaml'
+path_to_input_file = 'Inputs/Linear_Search_Features/Input_SVM_PENALTY_'+args.Ninput+'.yaml'
+path_to_output_file = 'Outputs/Linear_Search_Features/Output_HyperPara_SVM_PENALTY_'+args.Ninput+'.yaml'
 
 ## Read config file :
 with open(path_to_input_file, 'r') as f:
@@ -19,10 +19,10 @@ config = config[0]
 keys = np.fromiter(config.values(), dtype=float)
 keys[0]=200
 keys[1]=200
-keys[2]=200
+keys[3]=200
 keys[4]=200
-keys[5]=200
-keys[9]=200
+keys[8]=200
+keys[12]=200
 keys[13]=200
 pos = np.argwhere(keys!=200).item()
 var = str(list(config.keys())[pos])[2:]

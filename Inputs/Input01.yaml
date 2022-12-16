@@ -10,7 +10,7 @@ n_word_1gram:         500
 n_word_2gram:         500
 n_POS_tag_1gram:      48
 n_POS_tag_2gram:      500
-degree_svm : 1
+penalty : l2
 C_svm : 3
 seed: 22
 ...

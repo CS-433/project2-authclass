@@ -269,8 +269,10 @@ def extract_features(cohort,config,filetag):
 def classify(filetag, kernel,config,X_train,X_test,y_train,y_test):
 
     # Set SVM parameters 
-    degree_svm = config['degree_svm']
     C_svm = config['C_svm']
+    if config['penalty']==2:
+        penalty = 'l2'
+    else:  penalty = 'l1'
 
     train_proficiency = X_train['proficiency']
     X_train = X_train.drop(['proficiency'], axis = 1)#
@@ -283,8 +285,8 @@ def classify(filetag, kernel,config,X_train,X_test,y_train,y_test):
     if kernel == "poly":
         model = svm.SVC(kernel='poly', degree=3, C=1).fit(X_train, y_train['author_id'])
     if kernel == "linear":
-        model = svm.SVC(kernel='linear', degree=degree_svm, C=C_svm).fit(X_train, y_train['author_id'])
-    
+        #model = svm.SVC(kernel='linear', degree=degree_svm, C=C_svm).fit(X_train, y_train['author_id'])
+        model  = svm.LinearSVC(penalty=penalty,loss='squared_hinge',C=C_svm).fit(X_train,y_train['author_id'])
     # Split test into native and nonnative feeds (can handle all-native or all-non-native set)
     X_test_all_proficiencies = X_test.merge(test_proficiency, left_index=True, right_index=True, how='inner')
 
@@ -303,7 +305,7 @@ def classify(filetag, kernel,config,X_train,X_test,y_train,y_test):
     f1_all = f1_score(y_test['author_id'], pred_all, average='weighted')
         
     if X_test_native.shape[0] > 0:
-        print('Computing accuracy and f1 score on native test authors' )
+        #print('Computing accuracy and f1 score on native test authors' )
         pred_native = model.predict(X_test_native)
         accuracy_native = accuracy_score(y_test_native, pred_native)
         f1_native = f1_score(y_test_native, pred_native, average='weighted')
@@ -312,7 +314,7 @@ def classify(filetag, kernel,config,X_train,X_test,y_train,y_test):
         f1_native = 0
         
     if X_test_nonnat.shape[0] > 0:
-        print('Computing accuracy and f1 score on non-native test authors' )
+        #print('Computing accuracy and f1 score on non-native test authors' )
         pred_nonnat = model.predict(X_test_nonnat)
         accuracy_nonnat = accuracy_score(y_test_nonnat, pred_nonnat)
         f1_nonnat = f1_score(y_test_nonnat, pred_nonnat, average='weighted')
@@ -324,7 +326,7 @@ def classify(filetag, kernel,config,X_train,X_test,y_train,y_test):
     name_dict = 'Model '+ filetag
     dict_file = {name_dict:{'Accuracy' : {'Overall': "%.2f" % (accuracy_all*100),'Native' : "%.2f" % (accuracy_native*100),'Non_Native' : "%.2f" % (accuracy_nonnat*100)},
              'F1': {'Overall':"%.2f" % (f1_all*100),'Native': "%.2f" % (f1_native*100),'Non_Native' :"%.2f" % (f1_nonnat*100)},
-             'Infos': {'Model_Kernel' : model.kernel,'Nb_Natives': str(len(set(y_test_native))),'Nb_Non_Native': str(len(set(y_test_nonnat))),'Nb_Feeds_train': str(train_proficiency.shape[0]),'Nb_Feeds_test': str(test_proficiency.shape[0])}}}
+             'Infos': {'Model_Kernel': 'linear','Nb_Natives': str(len(set(y_test_native))),'Nb_Non_Native': str(len(set(y_test_nonnat))),'Nb_Feeds_train': str(train_proficiency.shape[0]),'Nb_Feeds_test': str(test_proficiency.shape[0])}}}
     
     return dict_file
     
