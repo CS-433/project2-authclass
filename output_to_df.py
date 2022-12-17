@@ -17,10 +17,10 @@ output_native = {'accuracy': [],
 output_non_native = { 'accuracy': [],
                      'f1':        []}
 
-path = 'Outputs/'
+path = 'Outputs/Linear_Search_Features/'
 
-for i in range(1,21):
-    file = 'Output_HyperPara_' + str(i) + '.yaml'
+for i in range(1,22):
+    file = 'Output_HyperPara_SVM_PENALTY_' + str(i) + '.yaml'
     with open(path + file, 'r') as f:
         config = list(yaml.load_all(f, Loader=SafeLoader))
     config = config[0]
@@ -43,8 +43,8 @@ output_all = pd.DataFrame(output_all)
 output_native = pd.DataFrame(output_native)
 output_non_native = pd.DataFrame(output_non_native)
 
-output_all.to_pickle('Data/grid_search_results/output_all.pkl')
-output_native.to_pickle('Data/grid_search_results/output_native.pkl')
-output_non_native.to_pickle('Data/grid_search_results/output_non_native.pkl')
+output_all.to_pickle('Data/grid_search_results/output__penalty_all.pkl')
+output_native.to_pickle('Data/grid_search_results/output_penalty_native.pkl')
+output_non_native.to_pickle('Data/grid_search_results/output_penalty_non_native.pkl')
 
 
