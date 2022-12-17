@@ -387,7 +387,7 @@ def character_ngrams_wrapper(dataframe, feed_token_space, newcolumn, n, collecti
         uptoN_collection = []
         for i in range(upper):
             uptoN_collection.append(c[i][0])
-        uptoN_collection.sort()  
+        #uptoN_collection.sort() # sorts alphabetically instead of by most common
     if train_collection != None:
         print("Performing test " + kind + " " + str(n) + "-gram...")
         uptoN_collection = train_collection
@@ -433,7 +433,7 @@ def word_ngrams_wrapper(dataframe, feed_comment_list_nopunc_lower, newcolumn, n,
         uptoN_collection = []
         for i in range(upper):
             uptoN_collection.append(c[i][0])
-        uptoN_collection.sort() 
+        #uptoN_collection.sort() # sorts alphabetically instead of by most common
     if train_collection != None:
         print("Performing test word " + str(n) + "-gram...")
         uptoN_collection = train_collection
@@ -692,7 +692,7 @@ def POS_tags_ngram_wrapper(dataframe, feed_comment_list_spacy, newcolumn, n, col
         uptoN_collection = []
         for i in range(upper):
             uptoN_collection.append(c[i][0])
-        uptoN_collection.sort() 
+        #uptoN_collection.sort() # sorts alphabetically instead of by most common
     if train_collection != None:
         print("Performing test POS tags " + str(n) + "-gram...")
         dataframe[feed_comment_list_spacy + "_tags"] = dataframe[feed_comment_list_spacy].apply(feed_comment_list_spacy_tags)
