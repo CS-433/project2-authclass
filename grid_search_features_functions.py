@@ -18,8 +18,9 @@ def classify_grid_search(filetag,config,X_train,X_test,y_train,y_test):
     for var in find_features_param(config.keys()) :
         n_collection = config[var] # value associated to var = n_xxx        
         var = var[2:] # now we consider the name xxx : remove n_
-        columns_to_drop = [var+'_'+str(i) for i in range(n_collection+1,max_collection_size(var,X_train))]
+        columns_to_drop = [var+'_'+str(i) for i in range(n_collection+1,max_collection_size(var,X_train)+1)]
         X_train_ = X_train_.drop(columns = columns_to_drop)
         X_test_ = X_test_.drop(columns = columns_to_drop)
+
     dict_result = classify(filetag, "linear",config,X_train_,X_test_,y_train,y_test)
     return dict_result
