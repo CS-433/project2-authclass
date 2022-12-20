@@ -1,0 +1,14 @@
+C_svm: 7
+n_POS_tag_1gram: 24
+n_POS_tag_2gram: 100
+n_digit_1gram: 10
+n_letter_1gram: 13
+n_letter_2gram: 200
+n_letter_3gram: 20
+n_letter_4gram: 100
+n_punctuation_1gram: 18
+n_punctuation_2gram: 200
+n_word_1gram: 500
+n_word_2gram: 500
+penalty: 2
+seed: 22

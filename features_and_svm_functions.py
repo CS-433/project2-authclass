@@ -110,6 +110,14 @@ def build_cohorts(n_native,n_nonnat,eng_native,eng_nonnat,seed):
     
     return cohort_all,cohort_native,cohort_nonnat
 
+def find_features_param(dict_keys):
+    ''' Returns the list of the names of features among a list of all feature paramters/hyperparamters '''
+    list_keys = list(dict_keys)
+    for s in list_keys:
+        if (s == 'C_svm') | (s=='penalty') | (s == 'seed') :
+            list_keys.remove(s)
+    return list_keys
+
 
 def extract_features(cohort,config,filetag):
 
@@ -256,11 +264,11 @@ def extract_features(cohort,config,filetag):
         elif stage == "test":
             X_test = feeds_aug
     print("Feature matrix X_train of shape", np.shape(X_train), " has been built")
-    path = "dataset/Tunning/"
-    X_train.to_parquet(path+"X_train_"+filetag+'_500')
-    X_test.to_parquet(path+"X_test_"+filetag+'_500')
-    y_train.to_parquet(path+"y_train_"+filetag+'_500')
-    y_test.to_parquet(path+"y_test_"+filetag+'_500')
+    path = "dataset/Test/"
+    X_train.to_parquet(path+"X_train_"+filetag)
+    X_test.to_parquet(path+"X_test_"+filetag)
+    y_train.to_parquet(path+"y_train_"+filetag)
+    y_test.to_parquet(path+"y_test_"+filetag)
     
     return X_train,X_test,y_train,y_test
     #return letter_1gram_collection_fromtrain, letter_2gram_collection_fromtrain,letter_3gram_collection_fromtrain,letter_4gram_collection_fromtrain,digit_1gram_collection_fromtrain,digit_2gram_collection_fromtrain, digit_3gram_collection_fromtrain,punctuation_1gram_collection_fromtrain, punctuation_2gram_collection_fromtrain,punctuation_3gram_collection_fromtrain,word_1gram_collection_fromtrain,word_2gram_collection_fromtrain,POS_tags_1gram_collection_fromtrain, POS_tags_2gram_collection_fromtrain, POS_tags_3gram_collection_fromtrain
