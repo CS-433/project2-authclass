@@ -2,20 +2,16 @@
 #SBATCH --job-name=braindead
 #SBATCH --chdir /home/tabary/project2-braindead
 #SBATCH --nodes 1
-#SBATCH --ntasks 10
-#SBATCH --cpus-per-task 1
-#SBATCH --mem-per-cpu 4G
-#SBATCH --time 0:01:00
+#SBATCH --ntasks 1
+#SBATCH --cpus-per-task 25
+#SBATCH --mem 64G
+#SBATCH --time 0:15:00
 
 echo STARTING AT `date`
 module purge 
 source ~/venvs/NLP/bin/activate
 module load gcc/8.4.0  python/3.7.7
 
-for A in $(seq -w 2000 2010); 
-do
-  python grid_search_features_script.py ${A} &
-done
+python output_to_df.py
 
-wait
 echo FINISHED at `date`

@@ -2,21 +2,22 @@ import yaml # for the config file
 import numpy as np
 from sklearn.model_selection import ParameterGrid
 import pandas as pd
+from tqdm import tqdm
 
 penalty                 = np.array([2])
 C_svm                   = np.array([3])
 seed                    = np.array([22])
 letter_1gram_range      = np.array([13,26])
-letter_2gram_range      = np.array([20,100,500])
-letter_3gram_range      = np.array([20,100,500])
-letter_4gram_range      = np.array([20,100,500])
+letter_2gram_range      = np.array([20,100,200, 500])
+letter_3gram_range      = np.array([20,100,200, 500])
+letter_4gram_range      = np.array([20,100,200, 500])
 digit_1gram_range       = np.array([5,10])
 punctuation_1gram_range = np.array([18,36])
-punctuation_2gram_range = np.array([20,100,500])
-word_1gram_range        = np.array([20,100,500])
-word_2gram_range        = np.array([20,100,500])
+punctuation_2gram_range = np.array([20,100, 200, 500])
+word_1gram_range        = np.array([20,100,200, 500])
+word_2gram_range        = np.array([20,100,200, 500])
 POS_tag_1gram_range     = np.array([24,48])
-POS_tag_2gram_range     = np.array([20,100,500])
+POS_tag_2gram_range     = np.array([20,100,200, 500])
 #C_svm_range             = [0.5,1,3,5,10]
 
 listKeys = ['C_svm',
@@ -52,7 +53,7 @@ param_grid = {'seed': seed,
 grid = ParameterGrid(param_grid)
 id = 0
 list_of_dicts = []
-for dicts in grid :
+for dicts in tqdm(grid) :
     id+=1
     path_to_input_file = 'Inputs/Grid_Search_Features/Input'+str(id)+'.yaml'
     listValues = list(dicts.values())
