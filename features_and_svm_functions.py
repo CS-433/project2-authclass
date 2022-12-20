@@ -50,7 +50,6 @@ def build_cohorts(n_native,n_nonnat,eng_native,eng_nonnat,seed):
     eng_feeds['author'] = eng_feeds.index
     eng_feeds = pd.wide_to_long(eng_feeds, ["feed", "slices"], i="author", j="intra_author_feed_id").sort_index()
     eng_feeds = eng_feeds.rename(columns={"slices": "comment_lengths", "feed": "feed_tokens_space"})
-    eng_feeds.to_parquet('eng_feeds')
 
     # Raw string version of feeds
     eng_feeds['feed_string'] = eng_feeds['feed_tokens_space'].apply(lambda x: ' '.join(x))

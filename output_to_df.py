@@ -39,13 +39,12 @@ for i in tqdm(range(1,262144)):
     output_non_native['f1'].append(config['Model cohort_nonnat']['F1']['Non_Native'])
 
 
-index = [i for i in range(262143)]
-output_all = pd.DataFrame(output_all, index = index)
-output_native = pd.DataFrame(output_native, index = index)
-output_non_native = pd.DataFrame(output_non_native, index = index)
+output_all = pd.DataFrame(output_all)
+output_native = pd.DataFrame(output_native)
+output_non_native = pd.DataFrame(output_non_native)
 
-output_all.to_pickle('features/grid_search_results/output_all.pkl')
-output_native.to_pickle('features/grid_search_results/output_native.pkl')
-output_non_native.to_pickle('features/grid_search_results/output_non_native.pkl')
+output_all.to_pickle('Data/grid_search_results/output__penalty_all.pkl')
+output_native.to_pickle('Data/grid_search_results/output_penalty_native.pkl')
+output_non_native.to_pickle('Data/grid_search_results/output_penalty_non_native.pkl')
 
 
