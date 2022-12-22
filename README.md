@@ -67,17 +67,17 @@ The development stage leads to three sets of parameters corresponding to the bes
 The accuracy and f1 score for each of these models can be obtained by following these steps :
 -   Go in directory Code/Development_and_Evaluation_Stages 
 -   Run ```python3 classify_script.py 0```
--   The results should appear in folder 'Outputs' with the names 'Output_tuned_all.yaml', 'Output_tuned_native.yaml', and 'Output_nonnative_all.yaml'.
+-   The results should appear in folder 'Outputs' with the names `Output_tuned_all.yaml`, `Output_tuned_native.yaml`, and `Output_nonnative_all.yaml`.
 
 Example of how to read these output files : 
 
-In file Output_tuned_xxx.yaml, look for accuracy and f1-score of 'model xxx' on 'cohort xxx'. They are the two scores reported in _Table 1. in our paper_.
+In file `Output_tuned_xxx.yaml`, look for accuracy and f1-score of 'model xxx' on 'cohort xxx'. They are the two scores reported in _Table 1. in our paper_.
 
 ## Evaluation stage 
 
-To reproduce scores written in _Table 1. in the appendix_ and the ones used to produce _Figure 3._, please go to the directory Code/Development_and_Evaluation_Stage and then :
--   Run the two first cells of the nortebook  Evaluation_Stage.ipynb
+To reproduce scores written in _Table 1. in the appendix_ and the ones used to produce _Figure 3._, please go to the directory `Code/Development_and_Evaluation_Stage` and then :
+-   Run the two first cells of the nortebook  `Evaluation_Stage.ipynb`
 -   Jump to section 'Evaluation Stage' and run all cells until the end of the notebook
--   4 files should be created in folder Outputs, named 'RESULTS_EVALUATION_STAGE_xxx.yaml'
+-   4 files should be created in folder Outputs, named `RESULTS_EVALUATION_STAGE_xxx.yaml`
 
-The heat map in _Figure 3._ displays results from file RESULTS_EVALUATION_STAGE.yaml, while the three other files give the scores of _Table 1. (appendix)._
+The heat map in _Figure 3._ displays results from file `RESULTS_EVALUATION_STAGE.yaml`, while the three other files give the scores of _Table 1. (appendix)._
