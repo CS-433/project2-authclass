@@ -30,10 +30,14 @@
             ├── Feature Tuning Dataframes
 
 # How to install the project 
-
+All the required packages are in the txt file `requirements.txt`.
 ## Data to download 
+Some of the files are too big to be uploaded on GitHub. They are however available at [this link](https://drive.switch.ch/index.php/s/bVBCqB0ReuX8e6z). In order to make the code runs, please follow these instructions.
 
-Access to classification data  : https://drive.google.com/drive/folders/1xoqUH0LWbdzhDhAUEURofisesBKkm24W?usp=sharing
+* The folder `user_comments` containing all the .json files must be put into the folder `./Raw/`.
+* The file `english_comments` must be in the folder `.Data/Preprocessing` 
+
+## 
 
 # How to use the project 
 
