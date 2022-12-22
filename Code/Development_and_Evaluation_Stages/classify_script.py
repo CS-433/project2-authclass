@@ -11,8 +11,8 @@ parser.add_argument("Ninput", help="read input file n°Ninput")
 args = parser.parse_args()
 
 # Path to input/output folders
-path_out = '../../Data/Outputs/Grid_Search_Features/'
-path_in =  '../../Data/Inputs/Grid_Search_Features/'   ## This folder has to be filled manually bc too many files (extract from ../../Data/Tuning/Feature Tuning Dataframes/inputs_df)
+path_out = '../../Data/Outputs/'
+path_in =  '../../Data/Inputs/After_Tuning/'  
 
 ## Load train/test data 
 path_to_dataset = '../../Data/Tuning/'
@@ -29,14 +29,25 @@ X_test_nonnat = pd.read_pickle(path_to_dataset + 'X_test_cohort_nonnat_500.pkl')
 y_train_nonnat = pd.read_pickle(path_to_dataset + 'y_train_cohort_nonnat_500.pkl')
 y_test_nonnat = pd.read_pickle(path_to_dataset + 'y_test_cohort_nonnat_500.pkl')
 
-print('Task ', args.Ninput)
+#print('Task ', args.Ninput)
 
-for i in range(int(args.Ninput)*2000, (int(args.Ninput) + 1)*2000):
-        
+#for i in range(int(args.Ninput)*2000, (int(args.Ninput) + 1)*2000):  # for grid search on SCITAS
+for i in range(3):        
         # Read input file 
-        path_to_input_file = path_in + 'Input'+str(i+1)+'.yaml'
-        path_to_output_file = path_out + 'Output_Features_'+str(i+1)+'.yaml'
+        if(i==0):
+                path_to_input_file = path_in + 'Input_tuned_all.yaml'
+                path_to_output_file = path_out + 'Output_tuned_all.yaml'
+        elif (i==1):
+                path_to_input_file = path_in + 'Input_tuned_native.yaml'
+                path_to_output_file = path_out + 'Output_tuned_native.yaml'
+        elif (i==2):
+                path_to_input_file = path_in + 'Input_tuned_nonnative.yaml'
+                path_to_output_file = path_out + 'Output_tuned_nonnative.yaml'
         
+        # For grid search : comment 'if' statements above and uncomment following lines :
+        #path_to_input_file = path_in + 'Input'+str(i+1)+'.yaml'
+        #path_to_output_file = path_out + 'Output_Features_'+str(i+1)+'.yaml'
+                
         with open(path_to_input_file, 'r') as f:
                 config = list(yaml.load_all(f, Loader=SafeLoader))
         config = config[0]

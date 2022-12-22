@@ -1,4 +1,4 @@
-C_svm: 10
+C_svm: 5
 n_POS_tag_1gram: 48
 n_POS_tag_2gram: 200
 n_digit_1gram: 10
