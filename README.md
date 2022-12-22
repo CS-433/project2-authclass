@@ -3,9 +3,25 @@
 
 # **Language Stylometry Project**
 
-# Description 
+# Abstract 
 
-![Drag Racing](architecture.png)
+This project aims to investigate whether language proficiency variation has a performance impact on traditional stylometric author classification methods. In particular, we develop a multi-class SVM author classification model with a Writeprints-inspired feature set on aggregated english-language Reddit comments written by three cohorts: native English authors, non-native English authors, and a mix of the two. We find that applying a traditional Stylometric machine learning model to a mix of both native- and non-native English authors consistently outperforms models applied to either native or non-native authors alone. Additionally, after tuning n-gram collection sizes specifically for each cohort, we do not find evidence of a link between language proficiency and ‘ideal’ model parameters - but we do find non-native authors consistently benefit more
+from variation in said parameters than do native authors.
+
+# Structure of the study
+
+The project is divided into three successive stages :
+1.   **Preprocessing**
+2.   **Development stage**
+3.   **Evaluation stage**
+
+### **Preprocessing**
+###
+
+### **Development stage and evaluation stage** are described through the following diagram :
+
+![Architecture](architecture.png)
+###
 
 # Organization
    
@@ -37,11 +53,20 @@ Some of the files are too big to be uploaded on GitHub. They are however availab
 * The folder `user_comments` containing all the .json files must be put into the folder `./Raw/`.
 * The file `english_comments` must be in the folder `.Data/Preprocessing` 
 
-## 
+# How to reproduce our results 
 
-# How to use the project 
+## Preprocessing
 
+Running the Jupyter Notebook `Code/Preprocessing/preprocess.ipynb`, will transform raw data `user_comments` and `user_levels.csv` into a dataset containing only native and non-native english authors with more than 10'000 words written. The features will be extracted from this preprocessed dataset.
 
-## Reproduce our results 
+## Development stage
+The development stage leads to three sets of parameters corresponding to the best models we could train respectively on native, non-native, and mixed cohorts. 
+
+The accuracy and f1 score for each of these models can be obtained by following these steps :
+-   Go in directory Code/Development_and_Evaluation_Stages 
+-   Run ```python3 classify_script.py ```
+
+## Evaluation stage 
+
 
  
