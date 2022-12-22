@@ -1,0 +1,30 @@
+Parameters -all-:
+  Data -all-:
+    Accuracy (avg): 85.0
+    F1 (avg): 83.85
+  Data -native-:
+    Accuracy (avg): 78.33666666666666
+    F1 (avg): 49.56
+  Data -nonnat-:
+    Accuracy (avg): 81.11333333333333
+    F1 (avg): 80.41
+Parameters -native-:
+  Data -all-:
+    Accuracy (avg): 85.0
+    F1 (avg): 83.63
+  Data -native-:
+    Accuracy (avg): 77.22333333333333
+    F1 (avg): 75.19
+  Data -nonnat-:
+    Accuracy (avg): 83.89
+    F1 (avg): 82.88666666666666
+Parameters -nonnat-:
+  Data -all-:
+    Accuracy (avg): 86.66333333333333
+    F1 (avg): 85.81666666666666
+  Data -native-:
+    Accuracy (avg): 82.77666666666666
+    F1 (avg): 79.81333333333333
+  Data -nonnat-:
+    Accuracy (avg): 86.66333333333333
+    F1 (avg): 85.70333333333333
