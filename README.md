@@ -50,7 +50,7 @@ These comments are then grouped by documents of minimum 500 words (called 'feed'
 # How to install the project 
 All the required packages are in the txt file `requirements.txt`.
 ## Data to download 
-Some of the files are too big to be uploaded on GitHub. They are however available at [this link](https://drive.switch.ch/index.php/s/bVBCqB0ReuX8e6z). In order to make the code runs, please follow these instructions.
+Some of the files are too big to be uploaded on GitHub. They are however available at [this link](https://drive.switch.ch/index.php/s/bVBCqB0ReuX8e6z). In order to make the code run, please follow these instructions.
 
 * The folder `user_comments` containing all the .json files must be put into the folder `./Raw/`.
 * The file `english_comments` must be in the folder `.Data/Preprocessing` 
@@ -75,8 +75,8 @@ In file `Output_tuned_xxx.yaml`, look for accuracy and f1-score of 'model xxx' o
 
 ## Evaluation stage 
 
-To reproduce scores written in _Table 1. in the appendix_ and the ones used to produce _Figure 3._, please go to the directory `Code/Development_and_Evaluation_Stage` and then :
--   Run the two first cells of the nortebook  `Evaluation_Stage.ipynb`
+To reproduce scores written in _Table 1. in the appendix_ and the ones used to produce _Figure 3._, please reach the directory `Code/Development_and_Evaluation_Stage` and then :
+-   Run the two first cells of the notebook  `Evaluation_Stage.ipynb`
 -   Jump to section 'Evaluation Stage' and run all cells until the end of the notebook
 -   4 files should be created in folder Outputs, named `RESULTS_EVALUATION_STAGE_xxx.yaml`
 
