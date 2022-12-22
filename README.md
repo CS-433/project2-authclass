@@ -21,7 +21,7 @@ The project is divided into three successive stages :
 In the **preprocessing stage**, we transform the raw data to extract only the comments we are interested in: we want the comments written in English by authors, native or not, having written more than 10'000 words in total. 
 These comments are then grouped by documents of minimum 500 words (called 'feed'). At the end of this phase, each author has 20 feeds of about 500 words and are grouped by their proficiency: native or non-native.
 
-**Development stage and evaluation stage** are described through the following diagram :
+**Development stage and evaluation stage** are described in the following diagram :
 
 ![Architecture](architecture.png)
 
