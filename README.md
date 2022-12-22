@@ -5,8 +5,11 @@
 
 # Abstract 
 
-This project aims to investigate whether language proficiency variation has a performance impact on traditional stylometric author classification methods. In particular, we develop a multi-class SVM author classification model with a Writeprints-inspired feature set on aggregated english-language Reddit comments written by three cohorts: native English authors, non-native English authors, and a mix of the two. We find that applying a traditional Stylometric machine learning model to a mix of both native- and non-native English authors consistently outperforms models applied to either native or non-native authors alone. Additionally, after tuning n-gram collection sizes specifically for each cohort, we do not find evidence of a link between language proficiency and ‘ideal’ model parameters - but we do find non-native authors consistently benefit more
-from variation in said parameters than do native authors.
+We investigate whether language proficiency variation has a performance impact on traditional stylometric author classification methods. Insight into this potential link could decrease incidence of misattribution of dangerous or illegal text.
+
+In particular, we pursue multi-class author classification SVM models with Writeprints-inspired feature sets to aggregated english-language Reddit comments written by three cohorts: native English authors, non-native English authors, and a mix of the two. We find that applying SVMs to a mix of both native and non-native English authors consistently outperforms SVMs applied to either native or non-native authors alone.
+
+Additionally, after tuning n-gram collection sizes specifically for each cohort, we do not find evidence of an ‘ideal’ set of model parameters for a given language proficiency level but we do find non-native authors consistently benefit more from variation in said parameters than do native authors.
 
 # Structure of the study
 
@@ -15,10 +18,10 @@ The project is divided into three successive stages :
 2.   **Development stage**
 3.   **Evaluation stage**
 
-### **Preprocessing**
-###
+In the **preprocessing stage**, we transform the raw data to extract only the comments we are interested in: we want the comments written in English by authors, native or not, having written more than 10'000 words in total. 
+These comments are then grouped by documents of minimum 500 words (called 'feed'). At the end of this phase, each author has 20 feeds of about 500 words and are grouped by their proficiency: native or non-native.
 
-### **Development stage and evaluation stage** are described through the following diagram :
+**Development stage and evaluation stage** are described through the following diagram :
 
 ![Architecture](architecture.png)
 ###
@@ -57,7 +60,7 @@ Some of the files are too big to be uploaded on GitHub. They are however availab
 
 ## Preprocessing
 
-Running the Jupyter Notebook `Code/Preprocessing/preprocess.ipynb`, will transform raw data `user_comments` and `user_levels.csv` into a dataset containing only native and non-native english authors with more than 10'000 words written. The features will be extracted from this preprocessed dataset.
+Running the Jupyter Notebook `Code/Preprocessing/preprocess.ipynb`, will transform raw data `user_comments` and `user_levels.csv` into a dataset containing only native and non-native english authors with more than 10'000 words written. In the next stage, the features will be extracted from this preprocessed dataset.
 
 ## Development stage
 The development stage leads to three sets of parameters corresponding to the best models we could train respectively on native, non-native, and mixed cohorts. 
